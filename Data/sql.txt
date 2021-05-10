@@ -1,0 +1,2 @@
+﻿INSERT INTO pages(Pid, pagename, language)
+VALUES (NEWID(),'Contact','Az');
