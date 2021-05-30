@@ -18,6 +18,7 @@ namespace OnBazar.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+   // [Authorize]
     public class SettingsController : ControllerBase
     {
         private readonly IHostingEnvironment _host;
@@ -1021,41 +1022,46 @@ namespace OnBazar.Controllers
         #region ----------itemdetail
         [HttpGet]
         [Route("itemdetail")]
+        [Authorize]
         public IEnumerable itemdetail(string userId)
         {
-            var _itemd= _itemdetail.GetAll();
+            var _itemd = _itemdetail.GetAll();
             if (_itemd.Count() == 0) { return _itemd; }
-            if (userId!=null && userId != "") { _itemd = _itemdetail.GetAll().Where(fv => fv.firma_Id == _firma.GetAll().FirstOrDefault(f => f.userId == userId).firma_Id); }
+            if (userId != null && userId != "")
+            {
+                _itemd = _itemdetail.GetAll().Where(fv => fv.firma_Id == _firma.GetAll().FirstOrDefault(f => f.userId == userId).firma_Id);
+                // int vv = _itemd.Count();
+            }
             // var ffir= _firma.GetAll().FirstOrDefault(f=>f.userId== userId).firma_Id
-            var res = (from a in _itemd
-                       join p in _items_photo.GetAll() on a.item_Id equals p.item_Id
+            var res = (from a in _itemd.ToList()
+                           //join p in _items_photo.GetAll() on a.item_Id equals p.item_Id
                        join b in _firma.GetAll() on a.firma_Id equals b.firma_Id
                        join c in _gender.GetAll() on a.gender_Id equals c.gender_Id
                        join d in _item_categ.GetAll() on a.item_categoriy_Id equals d.item_categoriy_Id
                        join e in _item_marka.GetAll() on a.item_marka_Id equals e.item_marka_Id
-                       join f in _beden.GetAll() on a.beden_Id equals f.beden_Id into be
                        join q in _item_color.GetAll() on a.item_color_Id equals q.item_color_Id
+                       join s in _item_stil.GetAll() on a.item_stil_Id equals s.item_stil_Id
+                       join i in _kullanimAlani.GetAll() on a.kulalan_Id equals i.kulalan_Id
+                       join o in _kumashtipi.GetAll() on a.kumash_Id equals o.kumash_Id into kum
+                       join f in _beden.GetAll() on a.beden_Id equals f.beden_Id into be
                        join w in _qelip.GetAll() on a.qelip_Id equals w.qelip_Id into qel
                        join r in _item_materal.GetAll() on a.item_materal_Id equals r.item_materal_Id into mat
                        join t in _yaka.GetAll() on a.yaka_Id equals t.yaka_Id into ya
                        join y in _qoltipi.GetAll() on a.qol_Id equals y.qol_Id into qol
-                       join s in _item_stil.GetAll() on a.item_stil_Id equals s.item_stil_Id
                        join u in _item_desen.GetAll() on a.item_desen_Id equals u.item_desen_Id into des
-                       join i in _kullanimAlani.GetAll() on a.kulalan_Id equals i.kulalan_Id
-                       join o in _kumashtipi.GetAll() on a.kumash_Id equals o.kumash_Id into kum
-                       from _be in be.DefaultIfEmpty()
+                       from _kum in kum.DefaultIfEmpty()
+                       from _be in be.ToList().DefaultIfEmpty()
                        from _qel in qel.DefaultIfEmpty()
                        from _mat in mat.DefaultIfEmpty()
                        from _ya in ya.DefaultIfEmpty()
                        from _qol in qol.DefaultIfEmpty()
                        from _des in des.DefaultIfEmpty()
-                       from _kum in kum.DefaultIfEmpty()
 
                        select new
                        {
                            a.item_Id,
-                           p.item_photo_Id,
-                           p.item_photo_url,
+                           //p.item_photo_Id,
+                           //p.item_photo_url,
                            a.firma_Id,
                            b.firma_name,
                            a.gender_Id,
@@ -1065,28 +1071,35 @@ namespace OnBazar.Controllers
                            a.item_marka_Id,
                            e.item_marka_name,
                            a.beden_Id,
-                           _be.beden,
-                           _be.trEu,
+                           beden = _be?.beden ?? "",
+                           trEu = _be?.trEu ?? "",
+                           // beden = (_be.beden == null ? "" : _be.beden),
+                           // _be.beden,
+                           //_be.trEu,
                            a.item_color_Id,
                            q.item_color,
                            a.qelip_Id,
-                           _qel.qelip_name,
+                           //_qel.qelip_name,
+                           qelip_name = _qel?.qelip_name ?? "",
                            a.item_materal_Id,
-                           _mat.item_materal_name,
+                           // _mat.item_materal_name,
+                           item_materal_name = _mat?.item_materal_name ?? "",
                            a.yaka_Id,
-                           _ya.yaka_name,
-                           //t.yaka_name,
+                           //_ya.yaka_name,
+                           yaka_name = _ya?.yaka_name ?? "",
                            a.qol_Id,
-                           _qol.qoltipi_name,
-                           //y.qoltipi_name,
+                           //_qol.qoltipi_name,
+                           qoltipi_name = _qol?.qoltipi_name ?? "",
                            a.item_stil_Id,
                            s.item_stil_name,
                            a.item_desen_Id,
-                           _des.item_desen_name,
+                           //_des.item_desen_name,
+                           item_desen_name = _des?.item_desen_name ?? "",
                            a.kulalan_Id,
                            i.kullanim_name,
                            a.kumash_Id,
-                           _kum.kumash_name,
+                           // _kum.kumash_name,
+                           kumash_name = _kum?.kumash_name ?? "",
                            a.item_name,
                            a.item_code,
                            a.item_price,
@@ -1104,7 +1117,7 @@ namespace OnBazar.Controllers
         }
         [HttpPost]
         [Route("postitemdetail")]
-        // [Authorize]
+       // [Authorize]
         public async Task<IActionResult> postitemdetail([FromBody] _itemdetail p)
         {
             if (!ModelState.IsValid) { return BadRequest(ModelState); }
@@ -1169,6 +1182,7 @@ namespace OnBazar.Controllers
                 pp.item_discount = p.item_discount;
                 pp.item_hidden = p.item_hidden;
                 pp.item_delivery = p.item_delivery;
+                // string formattedIdentifier = p.qaime_date.ToString(System.Globalization.CultureInfo.InvariantCulture); // "02/10/2016 12:33:00"
                 pp.qaime_date = p.qaime_date;
                 pp.yaka_Id = p.yaka_Id;
                 await _itemdetail.InsertAsync(pp);
@@ -1202,8 +1216,33 @@ namespace OnBazar.Controllers
         }
         #endregion
         #region ----------items_photo--------------------------------------------
-
-        [HttpGet]
+        [Authorize]
+        [HttpPost]
+        [Route("uplodeAvatar")]
+        public async Task<IActionResult> uplodeAvatar()
+        {
+            if (!ModelState.IsValid) { return BadRequest(ModelState); }
+            else
+            {
+                var pp = new _items_photo();
+                pp.item_photo_Id = Guid.NewGuid().ToString();
+                var file = Request.Form.Files["file"];
+               // string exten = Path.GetExtension(file.FileName);
+               // string url = "Images/profile/" +  exten;
+                string _path = _host.ContentRootPath + "\\Images\\profile\\";
+                if (!(Directory.Exists(_path))) { Directory.CreateDirectory(_path); }
+                if (file.Length > 0)
+                {
+                    var path = Path.Combine(_path,file.FileName);
+                    using (var stream = new FileStream(path, FileMode.Create))
+                    {
+                        await file.CopyToAsync(stream);
+                    }
+                }               
+                return Ok();
+            }
+        }
+            [HttpGet]
         [Route("itemsphoto")]
         [Authorize]
         public IEnumerable<_items_photo> itemsphoto(string itemid)
@@ -1222,10 +1261,10 @@ namespace OnBazar.Controllers
                 var pp = new _items_photo();
                 pp.item_photo_Id = Guid.NewGuid().ToString();
                 var file = Request.Form.Files["file"];
-              //  var ft = Request.Form["gender_Id"];
-              //  var fff = Request.Form["firma_Id"].ToString();
-                var fi = Request.Form["firma_Id"].ToString();// _firma.GetAll().FirstOrDefault(f => f.firma_Id == Request.Form["firma_Id"]).firma_Id ;
-                var gen = _gender.GetAll().FirstOrDefault(k => k.gender_Id == Request.Form["gender_Id"]).gender_name;
+                var ft = Request.Form["gender_Id"];
+                //  var fff = Request.Form["firma_Id"].ToString();
+                string fi = Request.Form["firma_Id"].ToString();// _firma.GetAll().FirstOrDefault(f => f.firma_Id == Request.Form["firma_Id"]).firma_Id ;
+                var gen = Request.Form["gender_Id"].ToString();// _gender.GetAll().FirstOrDefault(k => k.gender_Id ==ft).gender_name;
                 string exten = Path.GetExtension(file.FileName);
                 string url = "Images/" + fi + "/" + gen + "/" + pp.item_photo_Id + exten;
                 string _path = _host.ContentRootPath + "\\Images\\" + fi + "\\" + gen + "\\";

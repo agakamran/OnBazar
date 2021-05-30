@@ -31,7 +31,7 @@ namespace OnBazar.Controllers
     {
         private readonly IRepository<_firma> _firma = null;
         private readonly ApplicationDbContext db;
-       // private readonly IAntiforgery _antiforgery;
+        // private readonly IAntiforgery _antiforgery;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private IUserValidator<ApplicationUser> userValidator;
@@ -39,26 +39,26 @@ namespace OnBazar.Controllers
         private IPasswordHasher<ApplicationUser> passwordHasher;
         private readonly IEmailSender _emailSender;
         //private readonly ILogger _logger;
-      //  private readonly IRepository<payment> _pa = null; //imkani
-      ///  private readonly IRepository<Price> _pr = null;  //qiymet
-      ////  private readonly IRepository<invoice> _inv = null;  //qiymet
-      //  private readonly IRepository<Customer> _cu = null;
-      //  private readonly IHostingEnvironment _hostingEnvironment;
+        //  private readonly IRepository<payment> _pa = null; //imkani
+        ///  private readonly IRepository<Price> _pr = null;  //qiymet
+        ////  private readonly IRepository<invoice> _inv = null;  //qiymet
+        //  private readonly IRepository<Customer> _cu = null;
+        //  private readonly IHostingEnvironment _hostingEnvironment;
         //-----------------------
         private RoleManager<IdentityRole> _roleManager;
         private IConfiguration _config;
-       // static int _issueCount = 0;
+        // static int _issueCount = 0;
         //-----------------------
 
 
         public AccountController(
             IRepository<_firma> firma,
             ApplicationDbContext _db,
-          //  IAntiforgery antiforgery,
-          //  IRepository<payment> pa,  IRepository<Customer> cu, IRepository<Price> pr,  IRepository<invoice> inv,     IHostingEnvironment hostingEnvironment,
+            //  IAntiforgery antiforgery,
+            //  IRepository<payment> pa,  IRepository<Customer> cu, IRepository<Price> pr,  IRepository<invoice> inv,     IHostingEnvironment hostingEnvironment,
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
-            IEmailSender emailSender,IConfiguration config, RoleManager<IdentityRole> roleMgr,
+            IEmailSender emailSender, IConfiguration config, RoleManager<IdentityRole> roleMgr,
             //ILogger<AccountController> logger, 
             IUserValidator<ApplicationUser> userValid,
           IPasswordValidator<ApplicationUser> passValid,
@@ -66,12 +66,12 @@ namespace OnBazar.Controllers
         {
             _firma = firma;
             db = _db;
-           // _pa = pa; _cu = cu;  _pr = pr;  _inv = inv;    _hostingEnvironment = hostingEnvironment;
-           // _antiforgery = antiforgery;
+            // _pa = pa; _cu = cu;  _pr = pr;  _inv = inv;    _hostingEnvironment = hostingEnvironment;
+            // _antiforgery = antiforgery;
             _userManager = userManager;
             _signInManager = signInManager;
             _emailSender = emailSender;
-           // _logger = logger;
+            // _logger = logger;
             userValidator = userValid;
             passwordValidator = passValid;
             passwordHasher = passwordHash;
@@ -84,17 +84,18 @@ namespace OnBazar.Controllers
         {
             return new string[] { "kamran", "Salam555" };
         }
-       
+
         [HttpPost]
         [AllowAnonymous]
         [Route("Login")]
-        public async Task<IActionResult> Login([FromBody]LoginViewModel model)
+        public async Task<IActionResult> Login([FromBody] LoginViewModel model)
         {
             //Request.HttpContext.Response.Headers.Add("X-Total-Count", "20");
             if (ModelState.IsValid)
             {
                 // This doesn't count login failures towards account lockout
                 // To enable password failures to trigger account lockout, set lockoutOnFailure: true
+               // Logout();
                 var user1 = await _userManager.FindByNameAsync(model.Email);
                 if (user1 == null || !(await _userManager.IsEmailConfirmedAsync(user1)))
                 {
@@ -107,19 +108,20 @@ namespace OnBazar.Controllers
                     var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
                     if (result.Succeeded)
                     {
-                      //  _logger.LogInformation("User logged in.");
+                        //  _logger.LogInformation("User logged in.");
                         var user = await _userManager.FindByEmailAsync(model.Email);
                         var tokenString = BuildToken(user);
-                        var use = new {
+                        var use = new
+                        {
                             uid = user.Id,
-                            displayName=user.UserName,
-                            email =user.Email,
-                            providerId=user.providerId,
-                            photoUrl= user.photoUrl ,
+                            displayName = user.UserName,
+                            email = user.Email,
+                            providerId = user.providerId,
+                            photoUrl = user.photoUrl,
                             isEmailConfirmed = user.EmailConfirmed,
                             PhoneNumber = user.PhoneNumber,
                             token = tokenString,
-                            mesage=""
+                            mesage = ""
                         };
                         return response = Ok(use //token = tokenString
                         );
@@ -133,16 +135,16 @@ namespace OnBazar.Controllers
                     }
                     if (result.IsLockedOut)
                     {
-                       // _logger.LogWarning("User account locked out.");
+                        // _logger.LogWarning("User account locked out.");
                         //  return RedirectToAction(nameof(Lockout));
                     }
                     else
                     {
-                        StatusMessage="Invalid login attempt.";
+                        StatusMessage = "Invalid login attempt.";
                         // return View(model);
                         // return Ok(new { StatusMessage = "Sizin şifrə uygun deyil." });
-                        return Ok(new { mesage = StatusMessage });
-                      
+                        return BadRequest(new { mesage = StatusMessage });
+
                     }
 
                 }
@@ -188,13 +190,13 @@ namespace OnBazar.Controllers
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
-           // _logger.LogInformation("User logged out.");
-            return Ok(new { mesage ="User logged out." });
+            // _logger.LogInformation("User logged out.");
+            return Ok(new { mesage = "User logged out." });
         }
         [HttpPost]
         [AllowAnonymous]
         [Route("Register")]
-        public async Task<IActionResult> Register([FromBody]RegisterViewModel model)
+        public async Task<IActionResult> Register([FromBody] RegisterViewModel model)
         {
             var msg = "Bad Request";
             if (!ModelState.IsValid)
@@ -223,21 +225,21 @@ namespace OnBazar.Controllers
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
-                   // _logger.LogInformation("User created a new account with password.");
+                    // _logger.LogInformation("User created a new account with password.");
                     var applicationRole = await _roleManager.FindByNameAsync("User");
                     if (applicationRole != null)
                     {
                         IdentityResult roleResult = await _userManager.AddToRoleAsync(user, applicationRole.Name);
 
-                      /*  var MaxDate = (from d in _pr.GetAll().Where(k => k._pname == "Imtahan") select d._pdate).Max();
-                        var p = _pr.GetAll().SingleOrDefault(k => k._pname == "Imtahan" && k._pdate == MaxDate)._price;
-                        payment pp = new payment();
-                        pp._pid = Guid.NewGuid().ToString(); pp._userId = user.Id; pp._Sum = p * 4; pp._date = DateTime.Now;
-                        await _pa.InsertAsync(pp);
+                        /*  var MaxDate = (from d in _pr.GetAll().Where(k => k._pname == "Imtahan") select d._pdate).Max();
+                          var p = _pr.GetAll().SingleOrDefault(k => k._pname == "Imtahan" && k._pdate == MaxDate)._price;
+                          payment pp = new payment();
+                          pp._pid = Guid.NewGuid().ToString(); pp._userId = user.Id; pp._Sum = p * 4; pp._date = DateTime.Now;
+                          await _pa.InsertAsync(pp);
 
-                        Customer cca = new Customer();
-                        cca.IdentityId = user.Id; cca.Locale = ""; cca.Location = "";
-                        await _cu.InsertAsync(cca);*/
+                          Customer cca = new Customer();
+                          cca.IdentityId = user.Id; cca.Locale = ""; cca.Location = "";
+                          await _cu.InsertAsync(cca);*/
                     }
                     await _signInManager.SignInAsync(user, isPersistent: false);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
@@ -245,19 +247,19 @@ namespace OnBazar.Controllers
                     {
                         var pp = new _firma();
                         pp.firma_Id = Guid.NewGuid().ToString();
-                        pp.firma_name =user.UserName;
-                        pp.firma_telefon ="";
-                        pp.firma_unvan ="";
-                        pp.firma_email =user.Email;
-                        pp.userId =user.Id;
+                        pp.firma_name = user.UserName;
+                        pp.firma_telefon = "";
+                        pp.firma_unvan = "";
+                        pp.firma_email = user.Email;
+                        pp.userId = user.Id;
                         await _firma.InsertAsync(pp);
-                        
+
                     }
                     //   Url = _config["ClientDomain"]; 
                     var callbackUrl = Url.EmailConfirmationLink(user.Id, code, Request.Scheme);
                     await _emailSender.SendEmailConfirmationAsync(model.Email, callbackUrl.Replace("https://localhost:44336", _config["ClientDomain"]), "E");
                     await _signInManager.SignInAsync(user, isPersistent: false);
-                  //  _logger.LogInformation("User created a new account with password.");
+                    //  _logger.LogInformation("User created a new account with password.");
                     msg = "User created a new account with password.";
                     return Ok(msg);
 
@@ -278,7 +280,7 @@ namespace OnBazar.Controllers
             {
                 ModelState.AddModelError("", "User Id and Code are required");
                 return BadRequest(new { mesage = ModelState });
-            }           
+            }
             var result = await _userManager.FindByEmailAsync(ema);
             if (result != null) { mes = ema; }
             return Ok(mes);
@@ -308,7 +310,7 @@ namespace OnBazar.Controllers
         [HttpPost]
         [AllowAnonymous]
         [Route("ForgotPassword")]
-        public async Task<IActionResult> ForgotPassword([FromBody]ForgotPasswordViewModel model)
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordViewModel model)
         {
             if (ModelState.IsValid)
             {
@@ -324,7 +326,7 @@ namespace OnBazar.Controllers
                     // For more information on how to enable account confirmation and password reset please
                     // visit https://go.microsoft.com/fwlink/?LinkID=532713
                     var code = await _userManager.GeneratePasswordResetTokenAsync(user);
-               
+
                     var callbackUrl = Url.ResetPasswordCallbackLink(user.Id, code, Request.Scheme);//Request.Scheme
                     await _emailSender.SendEmailConfirmationAsync(model.Email, callbackUrl.Replace("https://localhost:44378", _config["ClientDomain"]), "Rp");
                     // return emailSender.SendEmailAsync(email, "Confirm your email",
@@ -338,7 +340,7 @@ namespace OnBazar.Controllers
             // If we got this far, something failed, redisplay form
             return Ok(model);
         }
-    
+
         [HttpGet]
         [Route("_getConfirmation")]
         public IActionResult _getConfirmation(string id)
@@ -349,7 +351,7 @@ namespace OnBazar.Controllers
         [HttpPost]
         [AllowAnonymous]
         [Route("ResetPassword")]
-        public async Task<IActionResult> ResetPassword([FromBody]ResetPasswordViewModel model)
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordViewModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -375,22 +377,22 @@ namespace OnBazar.Controllers
         //-------------------------------------------------------------------------------------------------
         [TempData]
         public string StatusMessage { get; set; }
-        
+
         [HttpPost]
-       // [ValidateAntiForgeryToken]
+        // [ValidateAntiForgeryToken]
         [Route("ChangePassword")]
-        public async Task<IActionResult> ChangePassword([FromBody]ChangePasswordViewModel model)
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordViewModel model)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(new { mesage = ModelState });
             }
             var user = await _userManager.FindByEmailAsync(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value);
-           
+
             if (user == null)
             {
                 StatusMessage = "Sizin şifrə uygun deyil.";
-                return BadRequest(new { mesage = StatusMessage });               
+                return BadRequest(new { mesage = StatusMessage });
             }
             var hasPassword = await _userManager.HasPasswordAsync(user);
             if (hasPassword)
@@ -402,13 +404,13 @@ namespace OnBazar.Controllers
                     return View(model);
                 }
                 await _signInManager.SignInAsync(user, isPersistent: false);
-              //  _logger.LogInformation("User changed their password successfully.");               
+                //  _logger.LogInformation("User changed their password successfully.");               
 
                 return Ok(new { StatusMessage = "Your password has been changed." });
             }
             else { return Ok(new { StatusMessage = "Sizin şifrə uygun deyil." }); }
         }
-       
+
 
 
         //------Account son--------------------
@@ -457,7 +459,7 @@ namespace OnBazar.Controllers
         [AllowAnonymous]
         //[ValidateAntiForgeryToken]
         [Route("LoginWith2fa")]
-        public async Task<IActionResult> LoginWith2fa([FromBody]LoginWith2faViewModel model, bool rememberMe)
+        public async Task<IActionResult> LoginWith2fa([FromBody] LoginWith2faViewModel model, bool rememberMe)
         {
             if (!ModelState.IsValid)
             {
@@ -478,19 +480,19 @@ namespace OnBazar.Controllers
 
             if (result.Succeeded)
             {
-               // _logger.LogInformation("User with ID {UserId} logged in with 2fa.", user.Id);
+                // _logger.LogInformation("User with ID {UserId} logged in with 2fa.", user.Id);
                 //  return RedirectToLocal(returnUrl);
                 return Ok(new { twoFactorCode = "User with ID {UserId} logged in with 2fa." });
             }
             else if (result.IsLockedOut)
             {
-               // _logger.LogWarning("User with ID {UserId} account locked out.", user.Id);
+                // _logger.LogWarning("User with ID {UserId} account locked out.", user.Id);
                 // return RedirectToAction(nameof(Lockout));
                 return Ok(new { twoFactorCode = "User with ID {UserId} account locked out." });
             }
             else
             {
-              //  _logger.LogWarning("Invalid authenticator code entered for user with ID {UserId}.", user.Id);
+                //  _logger.LogWarning("Invalid authenticator code entered for user with ID {UserId}.", user.Id);
                 ModelState.AddModelError(string.Empty, "Invalid authenticator code.");
                 return Ok(new { twoFactorCode = "Invalid authenticator code." });
             }
@@ -514,7 +516,7 @@ namespace OnBazar.Controllers
         [AllowAnonymous]
         //[ValidateAntiForgeryToken]
         [Route("LoginWithRecoveryCode")]
-        public async Task<IActionResult> LoginWithRecoveryCode([FromBody]LoginWithRecoveryCodeViewModel model)
+        public async Task<IActionResult> LoginWithRecoveryCode([FromBody] LoginWithRecoveryCodeViewModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -541,13 +543,13 @@ namespace OnBazar.Controllers
             }
             if (result.IsLockedOut)
             {
-               // _logger.LogWarning("User with ID {UserId} account locked out.", user.Id);
+                // _logger.LogWarning("User with ID {UserId} account locked out.", user.Id);
                 // return RedirectToAction(nameof(Lockout));
                 return Ok(new { recoveryCode = "User with ID {UserId} account locked out." });
             }
             else
             {
-               // _logger.LogWarning("Invalid recovery code entered for user with ID {UserId}", user.Id);
+                // _logger.LogWarning("Invalid recovery code entered for user with ID {UserId}", user.Id);
                 ModelState.AddModelError(string.Empty, "Invalid recovery code entered.");
                 return Ok(new { recoveryCode = "Invalid recovery code entered." });
             }
@@ -590,7 +592,7 @@ namespace OnBazar.Controllers
             var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor: true);
             if (result.Succeeded)
             {
-               // _logger.LogInformation("User logged in with {Name} provider.", info.LoginProvider);
+                // _logger.LogInformation("User logged in with {Name} provider.", info.LoginProvider);
                 return RedirectToLocal(returnUrl);
             }
             if (result.IsLockedOut)
@@ -628,8 +630,8 @@ namespace OnBazar.Controllers
                     if (result.Succeeded)
                     {
                         await _signInManager.SignInAsync(user, isPersistent: false);
-                      //  _logger.LogInformation("User created an account using {Name} provider.", info.LoginProvider);
-                      //  return RedirectToLocal(returnUrl);
+                        //  _logger.LogInformation("User created an account using {Name} provider.", info.LoginProvider);
+                        //  return RedirectToLocal(returnUrl);
                     }
                 }
                 AddErrors(result);
@@ -664,7 +666,7 @@ namespace OnBazar.Controllers
                 PhoneNumber = user.PhoneNumber,
                 IsEmailConfirmed = user.EmailConfirmed,
                 StatusMessage = StatusMessage,
-                photoUrl=user.photoUrl
+                photoUrl = user.photoUrl
             };
 
             return Ok(model);
@@ -672,7 +674,7 @@ namespace OnBazar.Controllers
         [HttpPost]
         //[ValidateAntiForgeryToken]
         [Route("profil")]
-        public async Task<IActionResult> profil([FromBody]IndexViewModel model)
+        public async Task<IActionResult> profil([FromBody] IndexViewModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -708,26 +710,27 @@ namespace OnBazar.Controllers
                 await _firma.InsertAsync(pp);
                 return Ok();
             }
-            else if(model.photoUrl==null)
+            else if (model.PhoneNumber != d.firma_telefon)
             {
                 d.firma_Id = d.firma_Id;
                 d.firma_telefon = model.PhoneNumber;
                 await _firma.EditAsync(d);
-                phoneNumber=model.PhoneNumber;
+                phoneNumber = model.PhoneNumber;
             }
-           
-            if (model.PhoneNumber != phoneNumber )
+
+            //if (model.PhoneNumber != phoneNumber)
+            //{
+            //    var setPhoneResult = await _userManager.SetPhoneNumberAsync(user, model.PhoneNumber);
+            //    if (!setPhoneResult.Succeeded)
+            //    {
+            //        throw new ApplicationException($"Unexpected error occurred setting phone number for user with ID '{user.Id}'.");
+            //    }
+            //}
+            if (model.photoUrl != user.photoUrl || model.PhoneNumber != phoneNumber)
             {
                 var setPhoneResult = await _userManager.SetPhoneNumberAsync(user, model.PhoneNumber);
-                if (!setPhoneResult.Succeeded)
-                {
-                    throw new ApplicationException($"Unexpected error occurred setting phone number for user with ID '{user.Id}'.");
-                }
-            }
-            if (model.photoUrl != user.photoUrl)
-            {               
-                user.photoUrl = model.photoUrl;               
-                var setphotoUrl = await _userManager.UpdateAsync(user); 
+                user.photoUrl = model.photoUrl;
+                var setphotoUrl = await _userManager.UpdateAsync(user);
                 if (!setphotoUrl.Succeeded)
                 {
                     throw new ApplicationException($"Unexpected error occurred setting phone number for user with ID '{user.Id}'.");
@@ -937,37 +940,37 @@ namespace OnBazar.Controllers
 
             return Ok();
         }
-       /* [Authorize]
-        [HttpPost]
-        [Route("_Edmeb")]
-        public async Task<IActionResult> _Edmeb([FromBody] invoice model)
-        {
-            //[Payments]
-            //[invoices]
-            if (model.MovId != null || model.BId != null)
-            {
-                var MaxDate = (from d in _pr.GetAll().Where(k => k._pname == model._pid) select d._pdate).Max();
+        /* [Authorize]
+         [HttpPost]
+         [Route("_Edmeb")]
+         public async Task<IActionResult> _Edmeb([FromBody] invoice model)
+         {
+             //[Payments]
+             //[invoices]
+             if (model.MovId != null || model.BId != null)
+             {
+                 var MaxDate = (from d in _pr.GetAll().Where(k => k._pname == model._pid) select d._pdate).Max();
 
-                var pra = _pr.GetAll().SingleOrDefault(f => f._pname == model._pid && f._pdate == MaxDate);
-                var us = await _userManager.FindByEmailAsync(model._UserId);
-                invoice ini = new invoice();
-                ini.Inid = Guid.NewGuid().ToString();
-                ini._UserId = us.Email;
-                ini.MovId = model.MovId;
-                ini.BId = model.BId;
-                ini._pid = pra._pid;
-                ini.Tarix = DateTime.Now;
-                await _inv.InsertAsync(ini);
-                payment pp = new payment();
-                pp._pid = Guid.NewGuid().ToString();
-                pp._userId = us.Id;
-                pp._Sum = -pra._price;
-                pp._date = DateTime.Now;
-                await _pa.InsertAsync(pp);
-            }
-            return Ok();
-        }*/
-      
+                 var pra = _pr.GetAll().SingleOrDefault(f => f._pname == model._pid && f._pdate == MaxDate);
+                 var us = await _userManager.FindByEmailAsync(model._UserId);
+                 invoice ini = new invoice();
+                 ini.Inid = Guid.NewGuid().ToString();
+                 ini._UserId = us.Email;
+                 ini.MovId = model.MovId;
+                 ini.BId = model.BId;
+                 ini._pid = pra._pid;
+                 ini.Tarix = DateTime.Now;
+                 await _inv.InsertAsync(ini);
+                 payment pp = new payment();
+                 pp._pid = Guid.NewGuid().ToString();
+                 pp._userId = us.Id;
+                 pp._Sum = -pra._price;
+                 pp._date = DateTime.Now;
+                 await _pa.InsertAsync(pp);
+             }
+             return Ok();
+         }*/
+
         [HttpGet]
         [Route("_delUser")]
         public async Task<IActionResult> _delUser(string id)
@@ -993,7 +996,7 @@ namespace OnBazar.Controllers
             return Ok();
         }
 
-      
+
         //-------Administrator Son
         #region Helpers
 

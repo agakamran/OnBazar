@@ -242,8 +242,8 @@ namespace OnBazar.Models
         public int item_discount { get; set; }
         [Required]
         public bool item_hidden { get; set; } = false;
-        [MaxLength(50)]
-        public string item_delivery { get; set; }
+        //[MaxLength(50)]
+        public bool item_delivery { get; set; }
         [Required]
         public DateTime qaime_date { get; set; }
     }
