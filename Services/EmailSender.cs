@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
 using OnBazar.Models;
+using OnBazar.Models.Abstract;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -43,10 +44,11 @@ namespace OnBazar.Services
     }
     public class EmailSender : IEmailSender, ISmsSender
     {
+        
         public EmailSettings _emailSettings { get; }
         public EmailSender(IOptions<EmailSettings> emailSettings)
         {
-            _emailSettings = emailSettings.Value;
+            _emailSettings = emailSettings.Value;            
         }
         public Task SendEmailAsync(string email, string subject, string message)
         {
@@ -91,16 +93,20 @@ namespace OnBazar.Services
     }
     public interface IOrderProcessor
     {
-        void ProcessOrder(shopCart cart, _ShippingDetail shippingDetails);
+        void ProcessOrder(Cart cart, shipDetail shipDetails);
     }
     public class EmailOrderProcessor : IOrderProcessor
     {
         private EmailSettings emailSettings;
-        public EmailOrderProcessor(EmailSettings settings)
+        private readonly IRepository<orderm> _orderm = null;
+        private readonly IRepository<orderd> _orderd = null;
+        public EmailOrderProcessor(EmailSettings settings, IRepository<orderm> orderm, IRepository<orderd> orderd)
         {
             emailSettings = settings;
+            _orderm = orderm;
+            _orderd = orderd;
         }
-        public void ProcessOrder(shopCart cart, _ShippingDetail shippingInfo)
+        public void ProcessOrder(Cart cart, shipDetail shippingInfo)
         {
             string path = System.IO.Directory.GetCurrentDirectory();
             using (var smtpClient = new SmtpClient())
@@ -109,8 +115,7 @@ namespace OnBazar.Services
                 smtpClient.Host = emailSettings.PrimaryDomain;
                 smtpClient.Port = emailSettings.PrimaryPort;
                 smtpClient.UseDefaultCredentials = false;
-                smtpClient.Credentials
-                = new NetworkCredential(emailSettings.UsernameEmail, emailSettings.UsernamePassword);
+                smtpClient.Credentials = new NetworkCredential(emailSettings.UsernameEmail, emailSettings.UsernamePassword);
                 if (emailSettings.WriteAsFile)
                 {
                     smtpClient.DeliveryMethod = SmtpDeliveryMethod.SpecifiedPickupDirectory;
@@ -123,15 +128,14 @@ namespace OnBazar.Services
                 .AppendLine("Items:");
                 foreach (var line in cart.Lines)
                 {
-                    var subtotal = line.Product.item_sales_price * line.Quantity;
+                    var subtotal = line.Product.salesprice * line.Quantity;
                     body.AppendFormat("{0} x {1} (subtotal: {2:c}", line.Quantity,
-                    line.Product.item_name,
-                    subtotal);
-                }
+                    line.Product.itemname, subtotal);
+                }            
                 body.AppendFormat("Total order value: {0:c}", cart.ComputeTotalValue())
                 .AppendLine("---")
                 .AppendLine("Ship to:")
-                .AppendLine(shippingInfo.client_name)
+               // .AppendLine(shippingInfo.client_name)
                 .AppendLine(shippingInfo.client_sity)
                 .AppendLine(shippingInfo.client_strit ?? "")
                 .AppendLine(shippingInfo.client_house ?? "")
@@ -151,6 +155,35 @@ namespace OnBazar.Services
                     mailMessage.BodyEncoding = Encoding.ASCII;
                 }
                 smtpClient.Send(mailMessage);
+
+                //----------Master-------------------------------------       
+                orderm sm = new orderm();
+                sm.ormID = Guid.NewGuid().ToString();
+               // sm.ordName = shippingInfo.client_name;
+                sm.Unvan = shippingInfo.client_sity;
+                sm.ordTelefon = shippingInfo.client_phone;
+                sm.otptarix = System.DateTime.Now;
+                // sm.otptarix = System.Convert.ToDateTime("01/01/2015");
+                sm.summ = cart.ComputeTotalValue();
+                sm.getdi = false;
+                _orderm.InsertAsync(sm);
+                //var sonmas = repository.SifMByID(cart.ComputeTotalValue());
+                // var iid = sonmas.SifID;
+                //-----------------------------------------------
+                foreach (var line in cart.Lines)
+                {
+                    orderd sif = new orderd();
+                    ////------Detal-------------------            
+                    sif.Prodname = line.Product.itemname;
+                    sif.Qountity = line.Quantity;
+                    sif.Price = line.Product.salesprice;
+                    sif.ormID = sm.ormID;
+                    _orderd.InsertAsync(sif);
+                    //-------------------------
+                    var subtotal = line.Product.salesprice * line.Quantity;
+                    body.AppendFormat("{0} x {1} (Aralıq məbləğ: {2:c})\n", line.Quantity,
+                    line.Product.itemname, subtotal);
+                }
             }
         }        
     }

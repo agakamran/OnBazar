@@ -86,9 +86,7 @@ namespace OnBazar.Services
         private ApplicationDbContext _context;
         private readonly AppSettings _appSettings;
 
-        public UserService(
-            ApplicationDbContext context,
-            IOptions<AppSettings> appSettings)
+        public UserService(ApplicationDbContext context,IOptions<AppSettings> appSettings)
         {
             _context = context;
             _appSettings = appSettings.Value;
@@ -133,10 +131,7 @@ namespace OnBazar.Services
             user.RefreshTokens.Add(newRefreshToken);
             _context.Update(user);
             _context.SaveChanges();
-
-            // generate new jwt
             var jwtToken = generateJwtToken(user);
-
             return new AuthenticateResponse(user, jwtToken, newRefreshToken.Token);
         }
 
@@ -160,19 +155,14 @@ namespace OnBazar.Services
 
             return true;
         }
-
         public IEnumerable<ApplicationUser> GetAll()
         {
             return _context.Users;
         }
-
         public ApplicationUser GetById(string id)
         {
             return _context.Users.Find(id);
         }
-
-        // helper methods
-
         private string generateJwtToken(ApplicationUser user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -189,7 +179,6 @@ namespace OnBazar.Services
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
         }
-
         private RefreshToken generateRefreshToken(string ipAddress)
         {
             using (var rngCryptoServiceProvider = new RNGCryptoServiceProvider())

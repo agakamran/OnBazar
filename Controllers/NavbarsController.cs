@@ -148,7 +148,6 @@ namespace Webschool.Controllers
         public async Task<IActionResult> postmenu([FromBody] Navbar p)
         {
             if (!ModelState.IsValid) { return BadRequest(ModelState); }
-
             if (p.nid != "")
             {
                 var _p = _nav.GetAll().FirstOrDefault(x => x.nid == p.nid);
@@ -169,8 +168,7 @@ namespace Webschool.Controllers
                 _p.nisparent = p.nisparent;
                 _p.nicon = p.nicon;
                 _p.nrol = p.nrol;
-                await _nav.EditAsync(_p);
-                //-----------------------
+                await _nav.EditAsync(_p);               
                 //=============================
                 var nr = _navrol.GetAll().FirstOrDefault(y => y.nid == p.nid);
                 IdentityRole role = await _roleManager.FindByNameAsync(p.nrol);//"User"

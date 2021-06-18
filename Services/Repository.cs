@@ -35,13 +35,11 @@ namespace OnBazar.Services
         public IQueryable<TEntity> GetAll()
         {
             return DbSet;
-        }      
-
+        }       
         public IQueryable<TEntity> SearchFor(Expression<Func<TEntity, bool>> predicate)
         {
             return DbSet.Where(predicate);
         }
-
         public async Task EditAsync(TEntity entity)
         {
             try
@@ -84,17 +82,6 @@ namespace OnBazar.Services
             }
             
         }
-       /* public async Task SaveNewItem([FromBody] Item item)
-        {
-            var container = await db.Containers.FirstOrDefaultAsync(
-            c => c.Id == item.ContainerId
-            );
-            if (container == null) return false;
-            db.Items.Add(item);
-            await db.SaveChangesAsync();
-            return true;
-        }*/
-
         public async Task _InsertAsync(TEntity[] entity)
         {
             try
@@ -123,7 +110,6 @@ namespace OnBazar.Services
 
             }
         }
-
         public async Task DeleteAsync1(TEntity[] entity)
         {
             try
@@ -139,7 +125,21 @@ namespace OnBazar.Services
 
             }
         }
-
-        
+        //public IQueryable<TEntity> find(string id)
+        //{
+        //    IQueryable<TEntity> item = GetAll();
+        //    var ite = item.Where(w => w.item_Id == id).FirstOrDefault();
+        //    return ite;
+        //}
+        /* public async Task SaveNewItem([FromBody] Item item)
+        {
+            var container = await db.Containers.FirstOrDefaultAsync(
+            c => c.Id == item.ContainerId
+            );
+            if (container == null) return false;
+            db.Items.Add(item);
+            await db.SaveChangesAsync();
+            return true;
+        }*/
     }
 }

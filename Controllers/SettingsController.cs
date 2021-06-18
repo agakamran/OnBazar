@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using OnBazar.Models;
+using OnBazar.Models.Abstract;
 using OnBazar.Services;
 
 namespace OnBazar.Controllers
@@ -21,50 +22,55 @@ namespace OnBazar.Controllers
    // [Authorize]
     public class SettingsController : ControllerBase
     {
+       // private UnitOfWork unitOfWork = new UnitOfWork();
         private readonly IHostingEnvironment _host;
         private readonly IRepository<_firma> _firma = null;
         private readonly IRepository<_beden> _beden = null;
         private readonly IRepository<_gender> _gender = null;
-        private readonly IRepository<_item_categoriy> _item_categ = null;
-        private readonly IRepository<_item_color> _item_color = null;
-        private readonly IRepository<_item_desen> _item_desen = null;
-        private readonly IRepository<_item_marka> _item_marka = null;
-        private readonly IRepository<_item_materal> _item_materal = null;
-        private readonly IRepository<_item_stil> _item_stil = null;
+        private readonly IRepository<_categoriy> _categ = null;
+        private readonly IRepository<_color> _color = null;
+        private readonly IRepository<_desen> _desen = null;
+        private readonly IRepository<_marka> _marka = null;
+        private readonly IRepository<_material> _material = null;
+        private readonly IRepository<_stil> _stil = null;
         private readonly IRepository<_kullanimAlani> _kullanimAlani = null;
         private readonly IRepository<_kumashtipi> _kumashtipi = null;
         private readonly IRepository<_qelip> _qelip = null;
         private readonly IRepository<_qoltipi> _qoltipi = null;
         private readonly IRepository<_yaka> _yaka = null;
-        private readonly IRepository<_items_qaime> _items_qaime = null;
+        private readonly IRepository<_qaime> _qaime = null;
         private readonly IRepository<_itemdetail> _itemdetail = null;
-        private readonly IRepository<_items_photo> _items_photo = null;
-        private readonly IRepository<_item_sales> _item_sales = null;
-        private readonly IRepository<_ShippingDetail> _ShippingDetail = null;
+       // private readonly IRepository<itemorderd> _itemorderd = null;
+      //  private readonly IRepository<itemorderm> _itemorderm = null;
+        private readonly IRepository<_photo> _photo = null;
         private readonly UserManager<ApplicationUser> _userManager;
-        public SettingsController(IHostingEnvironment host, IRepository<_firma> firma, IRepository<_beden> beden, IRepository<_gender> gender, IRepository<_item_categoriy> item_categ,
+        private readonly IRepository<shipDetail> _ShippingDetail = null;        
+        public SettingsController(IHostingEnvironment host, IRepository<_firma> firma, IRepository<_beden> beden, IRepository<_gender> gender, IRepository<_categoriy> item_categ,
 
-            IRepository<_item_color> item_color, IRepository<_item_desen> item_desen, IRepository<_item_marka> item_marka, IRepository<_item_materal> item_materal,
-            IRepository<_item_stil> item_stil, IRepository<_kullanimAlani> kullanimAlani, IRepository<_kumashtipi> kumashtipi,
+            IRepository<_color> item_color, IRepository<_desen> item_desen, IRepository<_marka> item_marka, IRepository<_material> item_materal,
+            IRepository<_stil> item_stil, IRepository<_kullanimAlani> kullanimAlani, IRepository<_kumashtipi> kumashtipi,
             IRepository<_qelip> qelip, IRepository<_qoltipi> qoltipi, IRepository<_yaka> yaka, UserManager<ApplicationUser> userManager,
-            IRepository<_items_qaime> items_qaime, IRepository<_itemdetail> itemdetail, IRepository<_items_photo> items_photo,
-            IRepository<_item_sales> item_sales, IRepository<_ShippingDetail> ShippingDetail)
+            IRepository<_qaime> items_qaime, IRepository<_itemdetail> itemdetail,// IRepository<itemorderd> itemorderd, IRepository<itemorderm> itemorderm,
+            IRepository<_photo> items_photo,           
+            IRepository<shipDetail> ShippingDetail)
         {
             _host = host;
             _userManager = userManager;
             _firma = firma;
             _beden = beden;
             _gender = gender;
-            _item_categ = item_categ;
-            _item_color = item_color;
-            _item_desen = item_desen;
-            _item_marka = item_marka;
-            _item_materal = item_materal;
-            _item_sales = item_sales;
-            _item_stil = item_stil;
+            _categ = item_categ;
+            _color = item_color;
+            _desen = item_desen;
+            _marka = item_marka;
+            _material = item_materal;
+           // _sales = item_sales;
+            _stil = item_stil;
             _itemdetail = itemdetail;
-            _items_photo = items_photo;
-            _items_qaime = items_qaime;
+            //_itemorderd = itemorderd;
+            //_itemorderm = itemorderm;
+            _photo = items_photo;
+            _qaime = items_qaime;
             _kullanimAlani = kullanimAlani;
             _kumashtipi = kumashtipi;
             _qelip = qelip;
@@ -77,8 +83,9 @@ namespace OnBazar.Controllers
         [Route("firma")]
         public IEnumerable<_firma> firma()
         {
-            // int c= _firma.GetAll().OrderBy(o => o.firma_Id).Count();
-            return _firma.GetAll().OrderBy(o => o.firma_Id);
+           // int Xx = unitOfWork.FirmaRepository.Get().OrderBy(o => o.firmaId).Count();
+            // int c= _firma.GetAll().OrderBy(o => o.firmaId).Count();
+            return _firma.GetAll().OrderBy(o => o.firmaId);
         }
         [Authorize(Roles = "Administrator")]
         [HttpPost]
@@ -87,22 +94,22 @@ namespace OnBazar.Controllers
         {
             if (!ModelState.IsValid) { return BadRequest(ModelState); }
 
-            if (p.firma_Id != "")
+            if (p.firmaId != "")
             {
-                var _p = _firma.GetAll().FirstOrDefault(x => x.firma_Id == p.firma_Id);
-                _p.firma_Id = _p.firma_Id;
-                _p.firma_name = p.firma_name;
-                _p.firma_telefon = p.firma_telefon;
-                _p.firma_unvan = p.firma_unvan;
-                _p.firma_email = p.firma_email;
+                var _p = _firma.GetAll().FirstOrDefault(x => x.firmaId == p.firmaId);
+                _p.firmaId = _p.firmaId;
+                _p.firmaname = p.firmaname;
+                _p.firmatelefon = p.firmatelefon;
+                _p.firmaunvan = p.firmaunvan;
+                _p.firmaemail = p.firmaemail;
                 _p.userId = p.userId;
                 _p.voen = p.voen;
                 await _firma.EditAsync(_p);
-                var user = await _userManager.FindByEmailAsync(p.firma_email);
+                var user = await _userManager.FindByEmailAsync(p.firmaemail);
                 var phoneNumber = user.PhoneNumber;
-                if (p.firma_telefon != phoneNumber)
+                if (p.firmatelefon != phoneNumber)
                 {
-                    var setPhoneResult = await _userManager.SetPhoneNumberAsync(user, p.firma_telefon);
+                    var setPhoneResult = await _userManager.SetPhoneNumberAsync(user, p.firmatelefon);
                     if (!setPhoneResult.Succeeded)
                     {
                         throw new ApplicationException($"Unexpected error occurred setting phone number for user with ID '{user.Id}'.");
@@ -113,12 +120,12 @@ namespace OnBazar.Controllers
             else { return BadRequest(); }
             /* else
              {
-                 if (_firma.GetAll().FirstOrDefault(f => f.firma_name == p.firma_name && f.firma_email == p.firma_email) == null)
+                 if (_firma.GetAll().FirstOrDefault(f => f.firmaname == p.firmaname && f.firma_email == p.firma_email) == null)
                  {
                      var pp = new _firma();
-                     pp.firma_Id = Guid.NewGuid().ToString();                    
-                     pp.firma_name = p.firma_name;
-                     pp.firma_telefon = p.firma_telefon;
+                     pp.firmaId = Guid.NewGuid().ToString();                    
+                     pp.firmaname = p.firmaname;
+                     pp.firma_telefon = p.firmatelefon;
                      pp.firma_unvan = p.firma_unvan;
                      pp.firma_email = p.firma_email;
                      pp.userId = p.userId;                   
@@ -137,7 +144,7 @@ namespace OnBazar.Controllers
             {
                 return BadRequest(ModelState);
             }
-            var _p = _firma.GetAll().FirstOrDefault(f => f.firma_Id == p.firma_Id);
+            var _p = _firma.GetAll().FirstOrDefault(f => f.firmaId == p.firmaId);
             await _firma.DeleteAsync(_p);
 
             return Ok();
@@ -149,11 +156,11 @@ namespace OnBazar.Controllers
         public IEnumerable beden()
         {
             var res = (from a in _beden.GetAll()
-                       join c in _gender.GetAll() on a.gender_Id equals c.gender_Id
-                       join b in _item_categ.GetAll() on a.item_categoriy_Id equals b.item_categoriy_Id
+                       join c in _gender.GetAll() on a.genId equals c.genId
+                       join b in _categ.GetAll() on a.catId equals b.catId
                        select new
                        {
-                           a.beden_Id,
+                           a.bedenId,
                            a.beden,
                            a.trEu,
                            a.uk,
@@ -167,13 +174,13 @@ namespace OnBazar.Controllers
                            a.kot,
                            // a.kanvas,
                            a.uzunluk,
-                           a.gender_Id,
-                           c.gender_name,
-                           a.item_categoriy_Id,
-                           b.item_categoriy_name
+                           a.genId,
+                           c.genname,
+                           a.catId,
+                           b.catname
                        });
             return res.OrderBy(o => o.trEu).OrderBy(k => k.ayakUz).ToList();
-            // return _beden.GetAll().OrderBy(o => o.beden_Id);
+            // return _beden.GetAll().OrderBy(o => o.bedenId);
         }
         [Authorize(Roles = "Administrator")]
         [HttpPost]
@@ -182,11 +189,11 @@ namespace OnBazar.Controllers
         {
             if (!ModelState.IsValid) { return BadRequest(ModelState); }
 
-            if (p.beden_Id != "")
+            if (p.bedenId != "")
             {
 
-                var _p = _beden.GetAll().FirstOrDefault(x => x.beden_Id == p.beden_Id);
-                _p.beden_Id = _p.beden_Id;
+                var _p = _beden.GetAll().FirstOrDefault(x => x.bedenId == p.bedenId);
+                _p.bedenId = _p.bedenId;
                 _p.beden = p.beden;
                 _p.trEu = p.trEu;
                 _p.uk = p.uk;
@@ -198,10 +205,10 @@ namespace OnBazar.Controllers
                 _p.ichBacakBoyu = p.ichBacakBoyu;
                 _p.yaka = p.yaka;
                 _p.kot = p.kot;
-                // _p.kanvas = p.kanvas;
+                //_p.kanvas = p.kanvas;
                 _p.uzunluk = p.uzunluk;
-                _p.item_categoriy_Id = p.item_categoriy_Id;
-                _p.gender_Id = p.gender_Id;
+                _p.catId = p.catId;
+                _p.genId = p.genId;
 
                 await _beden.EditAsync(_p);
 
@@ -209,10 +216,10 @@ namespace OnBazar.Controllers
             }
             else
             {
-                if (_beden.GetAll().FirstOrDefault(x => x.beden_Id == p.beden_Id && x.gender_Id == p.gender_Id && x.item_categoriy_Id == p.item_categoriy_Id) == null)
+                if (_beden.GetAll().FirstOrDefault(x => x.bedenId == p.bedenId && x.genId == p.genId && x.catId == p.catId) == null)
                 {
                     var pp = new _beden();
-                    pp.beden_Id = Guid.NewGuid().ToString();
+                    pp.bedenId = Guid.NewGuid().ToString();
                     pp.beden = p.beden;
                     pp.trEu = p.trEu;
                     pp.uk = p.uk;
@@ -226,8 +233,8 @@ namespace OnBazar.Controllers
                     pp.kot = p.kot;
                     //  pp.kanvas = p.kanvas;
                     pp.uzunluk = p.uzunluk;
-                    pp.item_categoriy_Id = p.item_categoriy_Id;
-                    pp.gender_Id = p.gender_Id;
+                    pp.catId = p.catId;
+                    pp.genId = p.genId;
                     await _beden.InsertAsync(pp);
                     return Ok();
                 }
@@ -243,7 +250,7 @@ namespace OnBazar.Controllers
             {
                 return BadRequest(ModelState);
             }
-            var _p = _beden.GetAll().FirstOrDefault(x => x.beden_Id == p.beden_Id && x.gender_Id == p.gender_Id && x.item_categoriy_Id == p.item_categoriy_Id);
+            var _p = _beden.GetAll().FirstOrDefault(x => x.bedenId == p.bedenId && x.genId == p.genId && x.catId == p.catId);
             await _beden.DeleteAsync(_p);
 
             return Ok();
@@ -254,7 +261,7 @@ namespace OnBazar.Controllers
         [Route("gender")]
         public IEnumerable<_gender> gender()
         {
-            return _gender.GetAll().OrderBy(o => o.gender_Id);
+            return _gender.GetAll().OrderBy(o => o.genId);
         }
         [Authorize(Roles = "Administrator")]
         [HttpPost]
@@ -263,21 +270,21 @@ namespace OnBazar.Controllers
         {
             if (!ModelState.IsValid) { return BadRequest(ModelState); }
 
-            if (p.gender_Id != "")
+            if (p.genId != "")
             {
-                var _p = _gender.GetAll().FirstOrDefault(x => x.gender_Id == p.gender_Id);
-                _p.gender_Id = _p.gender_Id;
-                _p.gender_name = p.gender_name;
+                var _p = _gender.GetAll().FirstOrDefault(x => x.genId == p.genId);
+                _p.genId = _p.genId;
+                _p.genname = p.genname;
                 await _gender.EditAsync(_p);
                 return Ok();
             }
             else
             {
-                if (_gender.GetAll().FirstOrDefault(x => x.gender_name == p.gender_name && x.gender_Id == p.gender_Id) == null)
+                if (_gender.GetAll().FirstOrDefault(x => x.genname == p.genname && x.genId == p.genId) == null)
                 {
                     var pp = new _gender();
-                    pp.gender_Id = Guid.NewGuid().ToString();
-                    pp.gender_name = p.gender_name;
+                    pp.genId = Guid.NewGuid().ToString();
+                    pp.genname = p.genname;
                     await _gender.InsertAsync(pp);
                     return Ok();
                 }
@@ -293,7 +300,7 @@ namespace OnBazar.Controllers
             {
                 return BadRequest(ModelState);
             }
-            var _p = _gender.GetAll().FirstOrDefault(x => x.gender_name == p.gender_name && x.gender_Id == p.gender_Id);
+            var _p = _gender.GetAll().FirstOrDefault(x => x.genname == p.genname && x.genId == p.genId);
             await _gender.DeleteAsync(_p);
 
             return Ok();
@@ -318,18 +325,18 @@ namespace OnBazar.Controllers
             // if (_item_categ.GetAll().Count() == 0) {
             //  _addCate();
             //  }
-            var res = (from a in _item_categ.GetAll()
-                       join b in _gender.GetAll() on a.gender_Id equals b.gender_Id
+            var res = (from a in _categ.GetAll()
+                       join b in _gender.GetAll() on a.genId equals b.genId
                        select new
                        {
-                           a.item_categoriy_Id,
-                           a.item_categoriy_name,
+                           a.catId,
+                           a.catname,
                            a.parid,
-                           a.gender_Id,
-                           b.gender_name
+                           a.genId,
+                           b.genname
                        });
 
-            return res.OrderBy(o => o.gender_name).ToList();
+            return res.OrderBy(o => o.genname).ToList();
         }
         /* public async void _addCate()
          {
@@ -340,15 +347,15 @@ namespace OnBazar.Controllers
                  foreach(var p in items)
                  {
                      var _it = _item_categ.GetAll();
-                    // if (_it.FirstOrDefault(x => x.item_categoriy_name == p.item_categoriy_name && x.gender_Id == p.gender_Id) == null)
+                    // if (_it.FirstOrDefault(x => x.item_categoriy_name == p.item_categoriy_name && x.genId == p.genId) == null)
                    //  {
                          var pp = new _item_categoriy();
                          pp.item_categoriy_Id = Guid.NewGuid().ToString();
                          pp.item_categoriy_name = p.item_categoriy_name;   
-                         if (_it.FirstOrDefault(x => x.item_categoriy_name == p.parid && x.gender_Id == p.gender_Id) != null) {
-                             pp.parid = _it.FirstOrDefault(x => x.item_categoriy_name == p.parid && x.gender_Id == p.gender_Id).item_categoriy_Id;
+                         if (_it.FirstOrDefault(x => x.item_categoriy_name == p.parid && x.genId == p.genId) != null) {
+                             pp.parid = _it.FirstOrDefault(x => x.item_categoriy_name == p.parid && x.genId == p.genId).item_categoriy_Id;
                          }                      
-                         pp.gender_Id = p.gender_Id;
+                         pp.genId = p.genId;
                         await _item_categ.InsertAsync(pp);
                      //}
                  }
@@ -373,38 +380,38 @@ namespace OnBazar.Controllers
         [Authorize(Roles = "Administrator")]
         [HttpPost]
         [Route("postcategoriy")]
-        public async Task<IActionResult> postcategoriy([FromBody] _item_categoriy p)
+        public async Task<IActionResult> postcategoriy([FromBody] _categoriy p)
         {
             if (!ModelState.IsValid) { return BadRequest(ModelState); }
 
-            if (p.item_categoriy_Id != "")
+            if (p.catId != "")
             {
-                var _p = _item_categ.GetAll().FirstOrDefault(x => x.item_categoriy_Id == p.item_categoriy_Id);
-                _p.item_categoriy_Id = _p.item_categoriy_Id;
-                _p.item_categoriy_name = p.item_categoriy_name;
+                var _p = _categ.GetAll().FirstOrDefault(x => x.catId == p.catId);
+                _p.catId = _p.catId;
+                _p.catname = p.catname;
                 _p.parid = p.parid;
-                _p.gender_Id = p.gender_Id;
-                await _item_categ.EditAsync(_p);
+                _p.genId = p.genId;
+                await _categ.EditAsync(_p);
                 return Ok();
             }
             else
             {
                 try
                 {
-                    if (_item_categ.GetAll().FirstOrDefault(x => x.item_categoriy_name == p.item_categoriy_name && x.parid == p.parid && x.gender_Id == p.gender_Id) == null)
+                    if (_categ.GetAll().FirstOrDefault(x => x.catname == p.catname && x.parid == p.parid && x.genId == p.genId) == null)
                     {
-                        var pp = new _item_categoriy();
-                        pp.item_categoriy_Id = Guid.NewGuid().ToString();
-                        pp.item_categoriy_name = p.item_categoriy_name;
+                        var pp = new _categoriy();
+                        pp.catId = Guid.NewGuid().ToString();
+                        pp.catname = p.catname;
 
-                        // var pparid = _item_categ.GetAll().FirstOrDefault(f => f.item_categoriy_name.Trim().Contains(p.parid.Trim()) && f.gender_Id == p.gender_Id);
+                        // var pparid = _item_categ.GetAll().FirstOrDefault(f => f.item_categoriy_name.Trim().Contains(p.parid.Trim()) && f.genId == p.genId);
                         //  e.Notes.Contains(plan.Notes)
                         // if (pparid != null) { pp.parid = pparid.parid; }
                         // else { pp.parid = p.parid; }
 
                         pp.parid = p.parid;
-                        pp.gender_Id = p.gender_Id;
-                        await _item_categ.InsertAsync(pp);
+                        pp.genId = p.genId;
+                        await _categ.InsertAsync(pp);
                         return Ok();
                     }
                     else { return BadRequest(); }
@@ -420,14 +427,14 @@ namespace OnBazar.Controllers
         [Authorize(Roles = "Administrator")]
         [HttpPost]
         [Route("delcategoriy")]
-        public async Task<IActionResult> delcategoriy([FromBody] _item_categoriy p)
+        public async Task<IActionResult> delcategoriy([FromBody] _categoriy p)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            var _p = _item_categ.GetAll().FirstOrDefault(x => x.item_categoriy_Id == p.item_categoriy_Id);
-            await _item_categ.DeleteAsync(_p);
+            var _p = _categ.GetAll().FirstOrDefault(x => x.catId == p.catId);
+            await _categ.DeleteAsync(_p);
 
             return Ok();
         }
@@ -435,36 +442,36 @@ namespace OnBazar.Controllers
         #region ----------color
         [HttpGet]
         [Route("itemcolor")]
-        public IEnumerable<_item_color> itemcolor()
+        public IEnumerable<_color> itemcolor()
         {
-            return _item_color.GetAll().OrderBy(o => o.item_color_Id);
+            return _color.GetAll().OrderBy(o => o.colId);
         }
         [Authorize(Roles = "Administrator")]
         [HttpPost]
         [Route("postitemcolor")]
-        public async Task<IActionResult> postitemcolor([FromBody] _item_color p)
+        public async Task<IActionResult> postitemcolor([FromBody] _color p)
         {
             if (!ModelState.IsValid) { return BadRequest(ModelState); }
 
-            if (p.item_color_Id != "")
+            if (p.colId != "")
             {
-                var _p = _item_color.GetAll().FirstOrDefault(x => x.item_color_Id == p.item_color_Id);
-                _p.item_color_Id = _p.item_color_Id;
-                _p.item_color = p.item_color;
-                _p.url_color = p.url_color;
-                await _item_color.EditAsync(_p);
+                var _p = _color.GetAll().FirstOrDefault(x => x.colId == p.colId);
+                _p.colId = _p.colId;
+                _p.color = p.color;
+                _p.urlcolor = p.urlcolor;
+                await _color.EditAsync(_p);
 
                 return Ok();
             }
             else
             {
-                if (_item_color.GetAll().FirstOrDefault(f => f.item_color == p.item_color) == null)
+                if (_color.GetAll().FirstOrDefault(f => f.color == p.color) == null)
                 {
-                    var pp = new _item_color();
-                    pp.item_color_Id = Guid.NewGuid().ToString();
-                    pp.item_color = p.item_color;
-                    pp.url_color = p.url_color;
-                    await _item_color.InsertAsync(pp);
+                    var pp = new _color();
+                    pp.colId = Guid.NewGuid().ToString();
+                    pp.color = p.color;
+                    pp.urlcolor = p.urlcolor;
+                    await _color.InsertAsync(pp);
                     return Ok();
                 }
                 else { return BadRequest(); }
@@ -473,14 +480,14 @@ namespace OnBazar.Controllers
         [Authorize(Roles = "Administrator")]
         [HttpPost]
         [Route("delitemcolor")]
-        public async Task<IActionResult> delitemcolor([FromBody] _item_color p)
+        public async Task<IActionResult> delitemcolor([FromBody] _color p)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            var _p = _item_color.GetAll().FirstOrDefault(f => f.item_color_Id == p.item_color_Id);
-            await _item_color.DeleteAsync(_p);
+            var _p = _color.GetAll().FirstOrDefault(f => f.colId == p.colId);
+            await _color.DeleteAsync(_p);
 
             return Ok();
         }
@@ -488,34 +495,34 @@ namespace OnBazar.Controllers
         #region ----------_desen
         [HttpGet]
         [Route("itemdesen")]
-        public IEnumerable<_item_desen> itemdesen()
+        public IEnumerable<_desen> itemdesen()
         {
-            return _item_desen.GetAll().OrderBy(o => o.item_desen_Id);
+            return _desen.GetAll().OrderBy(o => o.desId);
         }
         [Authorize(Roles = "Administrator")]
         [HttpPost]
         [Route("postitemdesen")]
-        public async Task<IActionResult> postitemdesen([FromBody] _item_desen p)
+        public async Task<IActionResult> postitemdesen([FromBody] _desen p)
         {
             if (!ModelState.IsValid) { return BadRequest(ModelState); }
 
-            if (p.item_desen_Id != "")
+            if (p.desId != "")
             {
-                var _p = _item_desen.GetAll().FirstOrDefault(x => x.item_desen_Id == p.item_desen_Id);
-                _p.item_desen_Id = _p.item_desen_Id;
-                _p.item_desen_name = p.item_desen_name;
-                await _item_desen.EditAsync(_p);
+                var _p = _desen.GetAll().FirstOrDefault(x => x.desId == p.desId);
+                _p.desId = _p.desId;
+                _p.desname = p.desname;
+                await _desen.EditAsync(_p);
 
                 return Ok();
             }
             else
             {
-                if (_item_desen.GetAll().FirstOrDefault(f => f.item_desen_Id == p.item_desen_Id) == null)
+                if (_desen.GetAll().FirstOrDefault(f => f.desId == p.desId) == null)
                 {
-                    var pp = new _item_desen();
-                    pp.item_desen_Id = Guid.NewGuid().ToString();
-                    pp.item_desen_name = p.item_desen_name;
-                    await _item_desen.InsertAsync(pp);
+                    var pp = new _desen();
+                    pp.desId = Guid.NewGuid().ToString();
+                    pp.desname = p.desname;
+                    await _desen.InsertAsync(pp);
                     return Ok();
                 }
                 else { return BadRequest(); }
@@ -524,14 +531,14 @@ namespace OnBazar.Controllers
         [Authorize(Roles = "Administrator")]
         [HttpPost]
         [Route("delitemdesen")]
-        public async Task<IActionResult> delitemdesen([FromBody] _item_desen p)
+        public async Task<IActionResult> delitemdesen([FromBody] _desen p)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            var _p = _item_desen.GetAll().FirstOrDefault(f => f.item_desen_Id == p.item_desen_Id);
-            await _item_desen.DeleteAsync(_p);
+            var _p = _desen.GetAll().FirstOrDefault(f => f.desId == p.desId);
+            await _desen.DeleteAsync(_p);
 
             return Ok();
         }
@@ -539,34 +546,34 @@ namespace OnBazar.Controllers
         #region ----------marka
         [HttpGet]
         [Route("itemmarka")]
-        public IEnumerable<_item_marka> itemmarka()
+        public IEnumerable<_marka> itemmarka()
         {
-            return _item_marka.GetAll().OrderBy(o => o.item_marka_Id);
+            return _marka.GetAll().OrderBy(o => o.markaId);
         }
         [Authorize(Roles = "Administrator")]
         [HttpPost]
         [Route("postitemmarka")]
-        public async Task<IActionResult> postitemmarka([FromBody] _item_marka p)
+        public async Task<IActionResult> postitemmarka([FromBody] _marka p)
         {
             if (!ModelState.IsValid) { return BadRequest(ModelState); }
 
-            if (p.item_marka_Id != "")
+            if (p.markaId != "")
             {
-                var _p = _item_marka.GetAll().FirstOrDefault(x => x.item_marka_Id == p.item_marka_Id);
-                _p.item_marka_Id = _p.item_marka_Id;
-                _p.item_marka_name = p.item_marka_name;
-                await _item_marka.EditAsync(_p);
+                var _p = _marka.GetAll().FirstOrDefault(x => x.markaId == p.markaId);
+                _p.markaId = _p.markaId;
+                _p.markaname = p.markaname;
+                await _marka.EditAsync(_p);
 
                 return Ok();
             }
             else
             {
-                if (_item_marka.GetAll().FirstOrDefault(f => f.item_marka_name == p.item_marka_name) == null)
+                if (_marka.GetAll().FirstOrDefault(f => f.markaname == p.markaname) == null)
                 {
-                    var pp = new _item_marka();
-                    pp.item_marka_Id = Guid.NewGuid().ToString();
-                    pp.item_marka_name = p.item_marka_name;
-                    await _item_marka.InsertAsync(pp);
+                    var pp = new _marka();
+                    pp.markaId = Guid.NewGuid().ToString();
+                    pp.markaname = p.markaname;
+                    await _marka.InsertAsync(pp);
                     return Ok();
                 }
                 else { return BadRequest(); }
@@ -575,14 +582,14 @@ namespace OnBazar.Controllers
         [Authorize(Roles = "Administrator")]
         [HttpPost]
         [Route("delitemmarka")]
-        public async Task<IActionResult> delitemmarka([FromBody] _item_marka p)
+        public async Task<IActionResult> delitemmarka([FromBody] _marka p)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            var _p = _item_marka.GetAll().FirstOrDefault(f => f.item_marka_Id == p.item_marka_Id);
-            await _item_marka.DeleteAsync(_p);
+            var _p = _marka.GetAll().FirstOrDefault(f => f.markaId == p.markaId);
+            await _marka.DeleteAsync(_p);
 
             return Ok();
         }
@@ -590,34 +597,34 @@ namespace OnBazar.Controllers
         #region ----------materal
         [HttpGet]
         [Route("itemmateral")]
-        public IEnumerable<_item_materal> itemmateral()
+        public IEnumerable<_material> itemmateral()
         {
-            return _item_materal.GetAll().OrderBy(o => o.item_materal_Id);
+            return _material.GetAll().OrderBy(o => o.matId);
         }
         [Authorize(Roles = "Administrator")]
         [HttpPost]
         [Route("postitemmateral")]
-        public async Task<IActionResult> postitemmateral([FromBody] _item_materal p)
+        public async Task<IActionResult> postitemmateral([FromBody] _material p)
         {
             if (!ModelState.IsValid) { return BadRequest(ModelState); }
 
-            if (p.item_materal_Id != "")
+            if (p.matId != "")
             {
-                var _p = _item_materal.GetAll().FirstOrDefault(x => x.item_materal_Id == p.item_materal_Id);
-                _p.item_materal_Id = _p.item_materal_Id;
-                _p.item_materal_name = p.item_materal_name;
-                await _item_materal.EditAsync(_p);
+                var _p = _material.GetAll().FirstOrDefault(x => x.matId == p.matId);
+                _p.matId = _p.matId;
+                _p.matname = p.matname;
+                await _material.EditAsync(_p);
 
                 return Ok();
             }
             else
             {
-                if (_item_materal.GetAll().FirstOrDefault(f => f.item_materal_name == p.item_materal_name) == null)
+                if (_material.GetAll().FirstOrDefault(f => f.matname == p.matname) == null)
                 {
-                    var pp = new _item_materal();
-                    pp.item_materal_Id = Guid.NewGuid().ToString();
-                    pp.item_materal_name = p.item_materal_name;
-                    await _item_materal.InsertAsync(pp);
+                    var pp = new _material();
+                    pp.matId = Guid.NewGuid().ToString();
+                    pp.matname = p.matname;
+                    await _material.InsertAsync(pp);
                     return Ok();
                 }
                 else { return BadRequest(); }
@@ -626,14 +633,14 @@ namespace OnBazar.Controllers
         [Authorize(Roles = "Administrator")]
         [HttpPost]
         [Route("delitemmateral")]
-        public async Task<IActionResult> delitemmateral([FromBody] _item_materal p)
+        public async Task<IActionResult> delitemmateral([FromBody] _material p)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            var _p = _item_materal.GetAll().FirstOrDefault(f => f.item_materal_Id == p.item_materal_Id);
-            await _item_materal.DeleteAsync(_p);
+            var _p = _material.GetAll().FirstOrDefault(f => f.matId == p.matId);
+            await _material.DeleteAsync(_p);
 
             return Ok();
         }
@@ -641,34 +648,34 @@ namespace OnBazar.Controllers
         #region ----------item_stil
         [HttpGet]
         [Route("itemstil")]
-        public IEnumerable<_item_stil> itemstil()
+        public IEnumerable<_stil> itemstil()
         {
-            return _item_stil.GetAll().OrderBy(o => o.item_stil_Id);
+            return _stil.GetAll().OrderBy(o => o.stilId);
         }
         [Authorize(Roles = "Administrator")]
         [HttpPost]
         [Route("postitemstil")]
-        public async Task<IActionResult> postitemstil([FromBody] _item_stil p)
+        public async Task<IActionResult> postitemstil([FromBody] _stil p)
         {
             if (!ModelState.IsValid) { return BadRequest(ModelState); }
 
-            if (p.item_stil_Id != "")
+            if (p.stilId != "")
             {
-                var _p = _item_stil.GetAll().FirstOrDefault(x => x.item_stil_Id == p.item_stil_Id);
-                _p.item_stil_Id = _p.item_stil_Id;
-                _p.item_stil_name = p.item_stil_name;
-                await _item_stil.EditAsync(_p);
+                var _p = _stil.GetAll().FirstOrDefault(x => x.stilId == p.stilId);
+                _p.stilId = _p.stilId;
+                _p.stilname = p.stilname;
+                await _stil.EditAsync(_p);
 
                 return Ok();
             }
             else
             {
-                if (_item_stil.GetAll().FirstOrDefault(f => f.item_stil_name == p.item_stil_name) == null)
+                if (_stil.GetAll().FirstOrDefault(f => f.stilname == p.stilname) == null)
                 {
-                    var pp = new _item_stil();
-                    pp.item_stil_Id = Guid.NewGuid().ToString();
-                    pp.item_stil_name = p.item_stil_name;
-                    await _item_stil.InsertAsync(pp);
+                    var pp = new _stil();
+                    pp.stilId = Guid.NewGuid().ToString();
+                    pp.stilname = p.stilname;
+                    await _stil.InsertAsync(pp);
                     return Ok();
                 }
                 else { return BadRequest(); }
@@ -677,14 +684,14 @@ namespace OnBazar.Controllers
         [Authorize(Roles = "Administrator")]
         [HttpPost]
         [Route("delitemstil")]
-        public async Task<IActionResult> delitemstil([FromBody] _item_stil p)
+        public async Task<IActionResult> delitemstil([FromBody] _stil p)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            var _p = _item_stil.GetAll().FirstOrDefault(f => f.item_stil_Id == p.item_stil_Id);
-            await _item_stil.DeleteAsync(_p);
+            var _p = _stil.GetAll().FirstOrDefault(f => f.stilId == p.stilId);
+            await _stil.DeleteAsync(_p);
 
             return Ok();
         }
@@ -694,7 +701,7 @@ namespace OnBazar.Controllers
         [Route("kullanimAlani")]
         public IEnumerable<_kullanimAlani> kullanimAlani()
         {
-            return _kullanimAlani.GetAll().OrderBy(o => o.kulalan_Id);
+            return _kullanimAlani.GetAll().OrderBy(o => o.kulalanId);
         }
         [Authorize(Roles = "Administrator")]
         [HttpPost]
@@ -703,22 +710,22 @@ namespace OnBazar.Controllers
         {
             if (!ModelState.IsValid) { return BadRequest(ModelState); }
 
-            if (p.kulalan_Id != "")
+            if (p.kulalanId != "")
             {
-                var _p = _kullanimAlani.GetAll().FirstOrDefault(x => x.kulalan_Id == p.kulalan_Id);
-                _p.kulalan_Id = _p.kulalan_Id;
-                _p.kullanim_name = p.kullanim_name;
+                var _p = _kullanimAlani.GetAll().FirstOrDefault(x => x.kulalanId == p.kulalanId);
+                _p.kulalanId = _p.kulalanId;
+                _p.kullanimname = p.kullanimname;
                 await _kullanimAlani.EditAsync(_p);
 
                 return Ok();
             }
             else
             {
-                if (_kullanimAlani.GetAll().FirstOrDefault(f => f.kullanim_name == p.kullanim_name) == null)
+                if (_kullanimAlani.GetAll().FirstOrDefault(f => f.kullanimname == p.kullanimname) == null)
                 {
                     var pp = new _kullanimAlani();
-                    pp.kulalan_Id = Guid.NewGuid().ToString();
-                    pp.kullanim_name = p.kullanim_name;
+                    pp.kulalanId = Guid.NewGuid().ToString();
+                    pp.kullanimname = p.kullanimname;
                     await _kullanimAlani.InsertAsync(pp);
                     return Ok();
                 }
@@ -734,7 +741,7 @@ namespace OnBazar.Controllers
             {
                 return BadRequest(ModelState);
             }
-            var _p = _kullanimAlani.GetAll().FirstOrDefault(f => f.kulalan_Id == p.kulalan_Id);
+            var _p = _kullanimAlani.GetAll().FirstOrDefault(f => f.kulalanId == p.kulalanId);
             await _kullanimAlani.DeleteAsync(_p);
 
             return Ok();
@@ -745,7 +752,7 @@ namespace OnBazar.Controllers
         [Route("kumashtipi")]
         public IEnumerable<_kumashtipi> kumashtipi()
         {
-            return _kumashtipi.GetAll().OrderBy(o => o.kumash_Id);
+            return _kumashtipi.GetAll().OrderBy(o => o.kumashId);
         }
         [Authorize(Roles = "Administrator")]
         [HttpPost]
@@ -754,22 +761,22 @@ namespace OnBazar.Controllers
         {
             if (!ModelState.IsValid) { return BadRequest(ModelState); }
 
-            if (p.kumash_Id != "")
+            if (p.kumashId != "")
             {
-                var _p = _kumashtipi.GetAll().FirstOrDefault(x => x.kumash_Id == p.kumash_Id);
-                _p.kumash_Id = _p.kumash_Id;
-                _p.kumash_name = p.kumash_name;
+                var _p = _kumashtipi.GetAll().FirstOrDefault(x => x.kumashId == p.kumashId);
+                _p.kumashId = _p.kumashId;
+                _p.kumashname = p.kumashname;
                 await _kumashtipi.EditAsync(_p);
 
                 return Ok();
             }
             else
             {
-                if (_kumashtipi.GetAll().FirstOrDefault(f => f.kumash_name == p.kumash_name) == null)
+                if (_kumashtipi.GetAll().FirstOrDefault(f => f.kumashname == p.kumashname) == null)
                 {
                     var pp = new _kumashtipi();
-                    pp.kumash_Id = Guid.NewGuid().ToString();
-                    pp.kumash_name = p.kumash_name;
+                    pp.kumashId = Guid.NewGuid().ToString();
+                    pp.kumashname = p.kumashname;
                     await _kumashtipi.InsertAsync(pp);
                     return Ok();
                 }
@@ -785,7 +792,7 @@ namespace OnBazar.Controllers
             {
                 return BadRequest(ModelState);
             }
-            var _p = _kumashtipi.GetAll().FirstOrDefault(f => f.kumash_Id == p.kumash_Id);
+            var _p = _kumashtipi.GetAll().FirstOrDefault(f => f.kumashId == p.kumashId);
             await _kumashtipi.DeleteAsync(_p);
 
             return Ok();
@@ -796,7 +803,7 @@ namespace OnBazar.Controllers
         [Route("qelip")]
         public IEnumerable<_qelip> qelip()
         {
-            return _qelip.GetAll().OrderBy(o => o.qelip_Id);
+            return _qelip.GetAll().OrderBy(o => o.qelipId);
         }
         [Authorize(Roles = "Administrator")]
         [HttpPost]
@@ -805,22 +812,22 @@ namespace OnBazar.Controllers
         {
             if (!ModelState.IsValid) { return BadRequest(ModelState); }
 
-            if (p.qelip_Id != "")
+            if (p.qelipId != "")
             {
-                var _p = _qelip.GetAll().FirstOrDefault(x => x.qelip_Id == p.qelip_Id);
-                _p.qelip_Id = _p.qelip_Id;
-                _p.qelip_name = p.qelip_name;
+                var _p = _qelip.GetAll().FirstOrDefault(x => x.qelipId == p.qelipId);
+                _p.qelipId = _p.qelipId;
+                _p.qelipname = p.qelipname;
                 await _qelip.EditAsync(_p);
 
                 return Ok();
             }
             else
             {
-                if (_qelip.GetAll().FirstOrDefault(f => f.qelip_name == p.qelip_name) == null)
+                if (_qelip.GetAll().FirstOrDefault(f => f.qelipname == p.qelipname) == null)
                 {
                     var pp = new _qelip();
-                    pp.qelip_Id = Guid.NewGuid().ToString();
-                    pp.qelip_name = p.qelip_name;
+                    pp.qelipId = Guid.NewGuid().ToString();
+                    pp.qelipname = p.qelipname;
                     await _qelip.InsertAsync(pp);
                     return Ok();
                 }
@@ -836,7 +843,7 @@ namespace OnBazar.Controllers
             {
                 return BadRequest(ModelState);
             }
-            var _p = _qelip.GetAll().FirstOrDefault(f => f.qelip_Id == p.qelip_Id);
+            var _p = _qelip.GetAll().FirstOrDefault(f => f.qelipId == p.qelipId);
             await _qelip.DeleteAsync(_p);
 
             return Ok();
@@ -848,15 +855,15 @@ namespace OnBazar.Controllers
         public IEnumerable qoltipi()
         {
             var res = (from a in _qoltipi.GetAll()
-                       join b in _gender.GetAll() on a.gender_Id equals b.gender_Id
+                       join b in _gender.GetAll() on a.genId equals b.genId
                        select new
                        {
-                           a.qol_Id,
-                           a.qoltipi_name,
-                           a.gender_Id,
-                           b.gender_name
+                           a.qolId,
+                           a.qoltipiname,
+                           a.genId,
+                           b.genname
                        });
-            return res.OrderBy(o => o.qol_Id).ToList();
+            return res.OrderBy(o => o.qolId).ToList();
             // return _qoltipi.GetAll().OrderBy(o => o.qol_Id);
         }
         [Authorize(Roles = "Administrator")]
@@ -866,24 +873,24 @@ namespace OnBazar.Controllers
         {
             if (!ModelState.IsValid) { return BadRequest(ModelState); }
 
-            if (p.qol_Id != "")
+            if (p.qolId != "")
             {
-                var _p = _qoltipi.GetAll().FirstOrDefault(x => x.qol_Id == p.qol_Id);
-                _p.qol_Id = _p.qol_Id;
-                _p.qoltipi_name = p.qoltipi_name;
-                _p.gender_Id = p.gender_Id;
+                var _p = _qoltipi.GetAll().FirstOrDefault(x => x.qolId == p.qolId);
+                _p.qolId = _p.qolId;
+                _p.qoltipiname = p.qoltipiname;
+                _p.genId = p.genId;
                 await _qoltipi.EditAsync(_p);
 
                 return Ok();
             }
             else
             {
-                if (_qoltipi.GetAll().FirstOrDefault(f => f.qoltipi_name == p.qoltipi_name && f.gender_Id == p.gender_Id) == null)
+                if (_qoltipi.GetAll().FirstOrDefault(f => f.qoltipiname == p.qoltipiname && f.genId == p.genId) == null)
                 {
                     var pp = new _qoltipi();
-                    pp.qol_Id = Guid.NewGuid().ToString();
-                    pp.qoltipi_name = p.qoltipi_name;
-                    pp.gender_Id = p.gender_Id;
+                    pp.qolId = Guid.NewGuid().ToString();
+                    pp.qoltipiname = p.qoltipiname;
+                    pp.genId = p.genId;
                     await _qoltipi.InsertAsync(pp);
                     return Ok();
                 }
@@ -899,7 +906,7 @@ namespace OnBazar.Controllers
             {
                 return BadRequest(ModelState);
             }
-            var _p = _qoltipi.GetAll().FirstOrDefault(f => f.qol_Id == p.qol_Id);
+            var _p = _qoltipi.GetAll().FirstOrDefault(f => f.qolId == p.qolId);
             await _qoltipi.DeleteAsync(_p);
             return Ok();
         }
@@ -910,15 +917,15 @@ namespace OnBazar.Controllers
         public IEnumerable yaka()
         {
             var res = (from a in _yaka.GetAll()
-                       join b in _gender.GetAll() on a.gender_Id equals b.gender_Id
+                       join b in _gender.GetAll() on a.genId equals b.genId
                        select new
                        {
-                           a.yaka_Id,
-                           a.yaka_name,
-                           a.gender_Id,
-                           b.gender_name
+                           a.yakaId,
+                           a.yakaname,
+                           a.genId,
+                           b.genname
                        });
-            return res.OrderBy(o => o.yaka_Id).ToList();
+            return res.OrderBy(o => o.yakaId).ToList();
             //return _yaka.GetAll().OrderBy(o => o.yaka_Id);
         }
         [Authorize(Roles = "Administrator")]
@@ -928,24 +935,24 @@ namespace OnBazar.Controllers
         {
             if (!ModelState.IsValid) { return BadRequest(ModelState); }
 
-            if (p.yaka_Id != "")
+            if (p.yakaId != "")
             {
-                var _p = _yaka.GetAll().FirstOrDefault(x => x.yaka_Id == p.yaka_Id && x.gender_Id == p.gender_Id);
-                _p.yaka_Id = _p.yaka_Id;
-                _p.yaka_name = p.yaka_name;
-                _p.gender_Id = p.gender_Id;
+                var _p = _yaka.GetAll().FirstOrDefault(x => x.yakaId == p.yakaId && x.genId == p.genId);
+                _p.yakaId = _p.yakaId;
+                _p.yakaname = p.yakaname;
+                _p.genId = p.genId;
                 await _yaka.EditAsync(_p);
 
                 return Ok();
             }
             else
             {
-                if (_yaka.GetAll().FirstOrDefault(f => f.yaka_name == p.yaka_name && f.gender_Id == p.gender_Id) == null)
+                if (_yaka.GetAll().FirstOrDefault(f => f.yakaname == p.yakaname && f.genId == p.genId) == null)
                 {
                     var pp = new _yaka();
-                    pp.yaka_Id = Guid.NewGuid().ToString();
-                    pp.yaka_name = p.yaka_name;
-                    pp.gender_Id = p.gender_Id;
+                    pp.yakaId = Guid.NewGuid().ToString();
+                    pp.yakaname = p.yakaname;
+                    pp.genId = p.genId;
                     await _yaka.InsertAsync(pp);
                     return Ok();
                 }
@@ -961,7 +968,7 @@ namespace OnBazar.Controllers
             {
                 return BadRequest(ModelState);
             }
-            var _p = _yaka.GetAll().FirstOrDefault(f => f.yaka_Id == p.yaka_Id);
+            var _p = _yaka.GetAll().FirstOrDefault(f => f.yakaId == p.yakaId);
             await _yaka.DeleteAsync(_p);
             return Ok();
         }
@@ -970,36 +977,36 @@ namespace OnBazar.Controllers
         #region ----------items_qaime
         [HttpGet]
         [Route("itemsqaime")]
-        public IEnumerable<_items_qaime> itemsqaime()
+        public IEnumerable<_qaime> itemsqaime()
         {
-            return _items_qaime.GetAll().OrderBy(o => o.qaime_Id);
+            return _qaime.GetAll().OrderBy(o => o.qaimeId);
         }
         [Authorize(Roles = "Administrator")]
         [HttpPost]
         [Route("postitemsqaime")]
-        public async Task<IActionResult> postitemsqaime([FromBody] _items_qaime p)
+        public async Task<IActionResult> postitemsqaime([FromBody] _qaime p)
         {
             if (!ModelState.IsValid) { return BadRequest(ModelState); }
 
-            if (p.qaime_Id != "")
+            if (p.qaimeId != "")
             {
-                var _p = _items_qaime.GetAll().FirstOrDefault(x => x.qaime_Id == p.qaime_Id && x.firma_Id == p.firma_Id);
-                _p.qaime_Id = _p.qaime_Id;
-                _p.qaime_name = p.qaime_name;
-                _p.firma_Id = p.firma_Id;
-                await _items_qaime.EditAsync(_p);
+                var _p = _qaime.GetAll().FirstOrDefault(x => x.qaimeId == p.qaimeId && x.firmaId == p.firmaId);
+                _p.qaimeId = _p.qaimeId;
+                _p.qaimename = p.qaimename;
+                _p.firmaId = p.firmaId;
+                await _qaime.EditAsync(_p);
 
                 return Ok();
             }
             else
             {
-                if (_items_qaime.GetAll().FirstOrDefault(f => f.qaime_name == p.qaime_name && f.firma_Id == p.firma_Id) == null)
+                if (_qaime.GetAll().FirstOrDefault(f => f.qaimename == p.qaimename && f.firmaId == p.firmaId) == null)
                 {
-                    var pp = new _items_qaime();
-                    pp.qaime_Id = Guid.NewGuid().ToString();
-                    pp.qaime_name = p.qaime_name;
-                    pp.firma_Id = p.firma_Id;
-                    await _items_qaime.InsertAsync(pp);
+                    var pp = new _qaime();
+                    pp.qaimeId = Guid.NewGuid().ToString();
+                    pp.qaimename = p.qaimename;
+                    pp.firmaId = p.firmaId;
+                    await _qaime.InsertAsync(pp);
                     return Ok();
                 }
                 else { return BadRequest(); }
@@ -1008,14 +1015,14 @@ namespace OnBazar.Controllers
         [Authorize(Roles = "Administrator")]
         [HttpPost]
         [Route("delitemsqaime")]
-        public async Task<IActionResult> delitemsqaime([FromBody] _items_qaime p)
+        public async Task<IActionResult> delitemsqaime([FromBody] _qaime p)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            var _p = _items_qaime.GetAll().FirstOrDefault(f => f.qaime_Id == p.qaime_Id && f.firma_Id == p.firma_Id);
-            await _items_qaime.DeleteAsync(_p);
+            var _p = _qaime.GetAll().FirstOrDefault(f => f.qaimeId == p.qaimeId && f.firmaId == p.firmaId);
+            await _qaime.DeleteAsync(_p);
             return Ok();
         }
         #endregion
@@ -1029,28 +1036,31 @@ namespace OnBazar.Controllers
             if (_itemd.Count() == 0) { return _itemd; }
             if (userId != null && userId != "")
             {
-                _itemd = _itemdetail.GetAll().Where(fv => fv.firma_Id == _firma.GetAll().FirstOrDefault(f => f.userId == userId).firma_Id);
+                _itemd = _itemdetail.GetAll().Where(fv => fv.firmaId == _firma.GetAll().FirstOrDefault(f => f.userId == userId).firmaId);
                 // int vv = _itemd.Count();
             }
-            // var ffir= _firma.GetAll().FirstOrDefault(f=>f.userId== userId).firma_Id
+           // int cas = _itemd.Count();
+          //  if (_itemd.Count() == 0) {           return _itemd; }
+            // var ffir= _firma.GetAll().FirstOrDefault(f=>f.userId== userId).firmaId
             var res = (from a in _itemd.ToList()
-                           //join p in _items_photo.GetAll() on a.item_Id equals p.item_Id
-                       join b in _firma.GetAll() on a.firma_Id equals b.firma_Id
-                       join c in _gender.GetAll() on a.gender_Id equals c.gender_Id
-                       join d in _item_categ.GetAll() on a.item_categoriy_Id equals d.item_categoriy_Id
-                       join e in _item_marka.GetAll() on a.item_marka_Id equals e.item_marka_Id
-                       join q in _item_color.GetAll() on a.item_color_Id equals q.item_color_Id
-                       join s in _item_stil.GetAll() on a.item_stil_Id equals s.item_stil_Id
-                       join i in _kullanimAlani.GetAll() on a.kulalan_Id equals i.kulalan_Id
-                       join o in _kumashtipi.GetAll() on a.kumash_Id equals o.kumash_Id into kum
-                       join f in _beden.GetAll() on a.beden_Id equals f.beden_Id into be
-                       join w in _qelip.GetAll() on a.qelip_Id equals w.qelip_Id into qel
-                       join r in _item_materal.GetAll() on a.item_materal_Id equals r.item_materal_Id into mat
-                       join t in _yaka.GetAll() on a.yaka_Id equals t.yaka_Id into ya
-                       join y in _qoltipi.GetAll() on a.qol_Id equals y.qol_Id into qol
-                       join u in _item_desen.GetAll() on a.item_desen_Id equals u.item_desen_Id into des
+                       //join p in _items_photo.GetAll() on a.item_Id equals p.item_Id
+                       join b in _firma.GetAll() on a.firmaId equals b.firmaId
+                       join c in _gender.GetAll() on a.genId equals c.genId
+                       join d in _categ.GetAll() on a.catId equals d.catId
+                       join e in _marka.GetAll() on a.markaId equals e.markaId
+                       join q in _color.GetAll() on a.colId equals q.colId
+                       join s in _stil.GetAll() on a.stilId equals s.stilId
+                       join i in _kullanimAlani.GetAll() on a.kulalanId equals i.kulalanId
+                       join o in _kumashtipi.GetAll() on a.kumashId equals o.kumashId into kum
+                       join f in _beden.GetAll() on a.bedenId equals f.bedenId into be
+                       join w in _qelip.GetAll() on a.qelipId equals w.qelipId into qel
+                       join r in _material.GetAll() on a.matId equals r.matId into mat
+                       join t in _yaka.GetAll() on a.yakaId equals t.yakaId into ya
+                       join y in _qoltipi.GetAll() on a.qolId equals y.qolId into qol
+                       join u in _desen.GetAll() on a.desId equals u.desId into des
                        from _kum in kum.DefaultIfEmpty()
                        from _be in be.ToList().DefaultIfEmpty()
+
                        from _qel in qel.DefaultIfEmpty()
                        from _mat in mat.DefaultIfEmpty()
                        from _ya in ya.DefaultIfEmpty()
@@ -1059,60 +1069,60 @@ namespace OnBazar.Controllers
 
                        select new
                        {
-                           a.item_Id,
+                           a.itemId,
                            //p.item_photo_Id,
                            //p.item_photo_url,
-                           a.firma_Id,
-                           b.firma_name,
-                           a.gender_Id,
-                           c.gender_name,
-                           a.item_categoriy_Id,
-                           d.item_categoriy_name,
-                           a.item_marka_Id,
-                           e.item_marka_name,
-                           a.beden_Id,
+                           a.firmaId,
+                           b.firmaname,
+                           a.genId,
+                           c.genname,
+                           a.catId,
+                           d.catname,
+                           a.markaId,
+                           e.markaname,
+                           a.bedenId,
                            beden = _be?.beden ?? "",
                            trEu = _be?.trEu ?? "",
                            // beden = (_be.beden == null ? "" : _be.beden),
                            // _be.beden,
                            //_be.trEu,
-                           a.item_color_Id,
-                           q.item_color,
-                           a.qelip_Id,
+                           a.colId,
+                           q.color,
+                           a.qelipId,
                            //_qel.qelip_name,
-                           qelip_name = _qel?.qelip_name ?? "",
-                           a.item_materal_Id,
-                           // _mat.item_materal_name,
-                           item_materal_name = _mat?.item_materal_name ?? "",
-                           a.yaka_Id,
+                           qelipname = _qel?.qelipname ?? "",
+                           a.matId,
+                           // _mat.matname,
+                           matname = _mat?.matname ?? "",
+                           a.yakaId,
                            //_ya.yaka_name,
-                           yaka_name = _ya?.yaka_name ?? "",
-                           a.qol_Id,
+                           yaka_name = _ya?.yakaname ?? "",
+                           a.qolId,
                            //_qol.qoltipi_name,
-                           qoltipi_name = _qol?.qoltipi_name ?? "",
-                           a.item_stil_Id,
-                           s.item_stil_name,
-                           a.item_desen_Id,
-                           //_des.item_desen_name,
-                           item_desen_name = _des?.item_desen_name ?? "",
-                           a.kulalan_Id,
-                           i.kullanim_name,
-                           a.kumash_Id,
-                           // _kum.kumash_name,
-                           kumash_name = _kum?.kumash_name ?? "",
-                           a.item_name,
-                           a.item_code,
-                           a.item_price,
-                           a.item_sales_price,
-                           a.item_quantity,
-                           a.item_discount,
-                           a.item_hidden,
-                           a.item_delivery,
-                           a.qaime_date
+                           qoltipiname = _qol?.qoltipiname ?? "",
+                           a.stilId,
+                           s.stilname,
+                           a.desId,
+                           //_des.desname,
+                           desname = _des?.desname ?? "",
+                           a.kulalanId,
+                           i.kullanimname,
+                           a.kumashId,
+                           // _kum.kumashname,
+                           kumashname = _kum?.kumashname ?? "",
+                           a.itemname,
+                           a.code,
+                           a.hidden,
+                           a.price,
+                           a.salesprice,
+                           a.quantity,
+                           a.discount,                           
+                           a.delivery,
+                           a.qaimedate
                        });
 
             int bv = res.Count();
-            return res.OrderBy(o => o.item_Id).ToList();
+            return res.OrderBy(o => o.itemId).ToList();
             // return _itemdetail.GetAll().OrderBy(o => o.item_Id);
         }
         [HttpPost]
@@ -1121,70 +1131,70 @@ namespace OnBazar.Controllers
         public async Task<IActionResult> postitemdetail([FromBody] _itemdetail p)
         {
             if (!ModelState.IsValid) { return BadRequest(ModelState); }
-            if (p.item_Id != "")
+            if (p.itemId != "")
             {
-                var _p = _itemdetail.GetAll().FirstOrDefault(x => x.item_Id == p.item_Id);
-                _p.item_Id = _p.item_Id;
+                var _p = _itemdetail.GetAll().FirstOrDefault(x => x.itemId == p.itemId);
+                _p.itemId = _p.itemId;
                 //_p.qaime_Id = _p.qaime_Id;
-                _p.firma_Id = _p.firma_Id;
-                _p.gender_Id = p.gender_Id;
-                _p.item_categoriy_Id = p.item_categoriy_Id;
-                _p.item_marka_Id = p.item_marka_Id;
-                _p.beden_Id = p.beden_Id;
-                _p.item_color_Id = p.item_color_Id;
-                _p.qelip_Id = p.qelip_Id;
-                _p.item_materal_Id = p.item_materal_Id;
-                _p.qol_Id = p.qol_Id;
-                _p.item_stil_Id = p.item_stil_Id;
-                _p.item_desen_Id = p.item_desen_Id;
-                _p.kulalan_Id = p.kulalan_Id;
-                _p.kumash_Id = p.kumash_Id;
-                _p.item_name = p.item_name;
-                _p.item_code = p.item_code;
-                _p.item_price = p.item_price;
-                _p.item_sales_price = p.item_sales_price;
-                _p.item_quantity = p.item_quantity;
-                _p.item_discount = p.item_discount;
-                _p.item_hidden = p.item_hidden;
-                _p.yaka_Id = p.yaka_Id;
-                _p.qaime_date = p.qaime_date;
-                _p.item_delivery = p.item_delivery;
+                _p.firmaId = _p.firmaId;
+                _p.genId = p.genId;
+                _p.catId = p.catId;
+                _p.markaId = p.markaId;
+                _p.bedenId = p.bedenId;
+                _p.colId = p.colId;
+                _p.qelipId = p.qelipId;
+                _p.matId = p.matId;
+                _p.qolId = p.qolId;
+                _p.stilId = p.stilId;
+                _p.desId = p.desId;
+                _p.kulalanId = p.kulalanId;
+                _p.kumashId = p.kumashId;
+                _p.itemname = p.itemname;
+                _p.code = p.code;
+                _p.price = p.price;
+                _p.salesprice = p.salesprice;
+                _p.quantity = p.quantity;
+                _p.discount = p.discount;
+                _p.hidden = p.hidden;
+                _p.yakaId = p.yakaId;
+                _p.qaimedate = p.qaimedate;
+                _p.delivery = p.delivery;
                 await _itemdetail.EditAsync(_p);
                 return Ok(_p);
             }
             else
             {
-                // if (_itemdetail.GetAll().FirstOrDefault(f => f.item_name == p.item_name && f.firma_Id == p.firma_Id) == null)
+                // if (_itemdetail.GetAll().FirstOrDefault(f => f.item_name == p.item_name && f.firmaId == p.firmaId) == null)
                 // {
 
                 var pp = new _itemdetail();
-                pp.item_Id = Guid.NewGuid().ToString();
+                pp.itemId = Guid.NewGuid().ToString();
                 // pp.qaime_Id = p.qaime_Id;
-                var ff = _firma.GetAll().FirstOrDefault(f => f.firma_email == p.firma_Id);
-                pp.firma_Id = ff.firma_Id;
-                pp.gender_Id = p.gender_Id;
-                pp.item_categoriy_Id = p.item_categoriy_Id;
-                pp.item_marka_Id = p.item_marka_Id;
-                pp.beden_Id = p.beden_Id;
-                pp.item_color_Id = p.item_color_Id;
-                pp.qelip_Id = p.qelip_Id;
-                pp.item_materal_Id = p.item_materal_Id;
-                pp.qol_Id = p.qol_Id;
-                pp.item_stil_Id = p.item_stil_Id;
-                pp.item_desen_Id = p.item_desen_Id;
-                pp.kulalan_Id = p.kulalan_Id;
-                pp.kumash_Id = p.kumash_Id;
-                pp.item_name = p.item_name;
-                pp.item_code = p.item_code;
-                pp.item_price = p.item_price;
-                pp.item_sales_price = p.item_sales_price;
-                pp.item_quantity = p.item_quantity;
-                pp.item_discount = p.item_discount;
-                pp.item_hidden = p.item_hidden;
-                pp.item_delivery = p.item_delivery;
+                var ff = _firma.GetAll().FirstOrDefault(f => f.firmaemail == p.firmaId);
+                pp.firmaId = ff.firmaId;
+                pp.genId = p.genId;
+                pp.catId = p.catId;
+                pp.markaId = p.markaId;
+                pp.bedenId = p.bedenId;
+                pp.colId = p.colId;
+                pp.qelipId = p.qelipId;
+                pp.matId = p.matId;
+                pp.qolId = p.qolId;
+                pp.stilId = p.stilId;
+                pp.desId = p.desId;
+                pp.kulalanId = p.kulalanId;
+                pp.kumashId = p.kumashId;
+                pp.itemname = p.itemname;
+                pp.code = p.code;
+                pp.price = p.price;
+                pp.salesprice = p.salesprice;
+                pp.quantity = p.quantity;
+                pp.discount = p.discount;
+                pp.hidden = p.hidden;
+                pp.delivery = p.delivery;
                 // string formattedIdentifier = p.qaime_date.ToString(System.Globalization.CultureInfo.InvariantCulture); // "02/10/2016 12:33:00"
-                pp.qaime_date = p.qaime_date;
-                pp.yaka_Id = p.yaka_Id;
+                pp.qaimedate = p.qaimedate;
+                pp.yakaId = p.yakaId;
                 await _itemdetail.InsertAsync(pp);
                 // var c = pp.item_Id;
                 //  var ppp = _items_photo.GetAll().Where(k=>k.item_Id== "-111");
@@ -1208,10 +1218,10 @@ namespace OnBazar.Controllers
             {
                 return BadRequest(ModelState);
             }
-            var _p = _itemdetail.GetAll().FirstOrDefault(f => f.item_Id == p.item_Id);
+            var _p = _itemdetail.GetAll().FirstOrDefault(f => f.itemId == p.itemId);
             await _itemdetail.DeleteAsync(_p);
-            var _pp = _items_photo.GetAll().FirstOrDefault(f => f.item_Id == p.item_Id);
-            await _items_photo.DeleteAsync(_pp);
+            var _pp = _photo.GetAll().FirstOrDefault(f => f.itemId == p.itemId);
+            await _photo.DeleteAsync(_pp);
             return Ok();
         }
         #endregion
@@ -1224,8 +1234,8 @@ namespace OnBazar.Controllers
             if (!ModelState.IsValid) { return BadRequest(ModelState); }
             else
             {
-                var pp = new _items_photo();
-                pp.item_photo_Id = Guid.NewGuid().ToString();
+                var pp = new _photo();
+                pp.photoId = Guid.NewGuid().ToString();
                 var file = Request.Form.Files["file"];
                // string exten = Path.GetExtension(file.FileName);
                // string url = "Images/profile/" +  exten;
@@ -1245,10 +1255,10 @@ namespace OnBazar.Controllers
             [HttpGet]
         [Route("itemsphoto")]
         [Authorize]
-        public IEnumerable<_items_photo> itemsphoto(string itemid)
+        public IEnumerable<_photo> itemsphoto(string itemid)
         {
             //var f = _items_photo.GetAll().Where(k => k.item_Id == itemid);
-            return _items_photo.GetAll().Where(k => k.item_Id == itemid);
+            return _photo.GetAll().Where(k => k.itemId == itemid);
         }
         [Authorize]
         [HttpPost]
@@ -1258,29 +1268,29 @@ namespace OnBazar.Controllers
             if (!ModelState.IsValid) { return BadRequest(ModelState); }
             else
             {
-                var pp = new _items_photo();
-                pp.item_photo_Id = Guid.NewGuid().ToString();
+                var pp = new _photo();
+                pp.photoId = Guid.NewGuid().ToString();
                 var file = Request.Form.Files["file"];
-                var ft = Request.Form["gender_Id"];
-                //  var fff = Request.Form["firma_Id"].ToString();
-                string fi = Request.Form["firma_Id"].ToString();// _firma.GetAll().FirstOrDefault(f => f.firma_Id == Request.Form["firma_Id"]).firma_Id ;
-                var gen = Request.Form["gender_Id"].ToString();// _gender.GetAll().FirstOrDefault(k => k.gender_Id ==ft).gender_name;
+                var ft = Request.Form["genId"];
+                //  var fff = Request.Form["firmaId"].ToString();
+                string fi = Request.Form["firmaId"].ToString();// _firma.GetAll().FirstOrDefault(f => f.firmaId == Request.Form["firmaId"]).firmaId ;
+                var gen = Request.Form["genId"].ToString();// _gender.GetAll().FirstOrDefault(k => k.genId ==ft).genname;
                 string exten = Path.GetExtension(file.FileName);
-                string url = "Images/" + fi + "/" + gen + "/" + pp.item_photo_Id + exten;
+                string url = "Images/" + fi + "/" + gen + "/" + pp.photoId + exten;
                 string _path = _host.ContentRootPath + "\\Images\\" + fi + "\\" + gen + "\\";
 
                 if (!(Directory.Exists(_path))) { Directory.CreateDirectory(_path); }
                 if (file.Length > 0)
                 {
-                    var path = Path.Combine(_path, pp.item_photo_Id + exten);
+                    var path = Path.Combine(_path, pp.photoId + exten);
                     using (var stream = new FileStream(path, FileMode.Create))
                     {
                         await file.CopyToAsync(stream);
                     }
                 }
-                pp.item_Id = Request.Form["item_Id"];
-                pp.item_photo_url = url;
-                await _items_photo.InsertAsync(pp);
+                pp.itemId = Request.Form["itemId"];
+                pp.photourl = url;
+                await _photo.InsertAsync(pp);
                 return Ok();
 
 
@@ -1289,88 +1299,88 @@ namespace OnBazar.Controllers
         [Authorize]
         [HttpPost]
         [Route("delitemsphoto")]
-        public async Task<IActionResult> delitemsphoto([FromBody] _items_photo p)//[FromBody] _items_photo p
+        public async Task<IActionResult> delitemsphoto([FromBody] _photo p)//[FromBody] _items_photo p
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            var _p = _items_photo.GetAll().FirstOrDefault(f => f.item_photo_Id == p.item_photo_Id);
-            var fileSavePath = _host.ContentRootPath.Replace("\\", "/") + "/" + p.item_photo_url;
+            var _p = _photo.GetAll().FirstOrDefault(f => f.photoId == p.photoId);
+            var fileSavePath = _host.ContentRootPath.Replace("\\", "/") + "/" + p.photourl;
             if (System.IO.File.Exists(fileSavePath))
             {
                 System.IO.File.Delete(fileSavePath);
             }
-            await _items_photo.DeleteAsync(_p);
+            await _photo.DeleteAsync(_p);
             return Ok();
         }
         #endregion
-        //--------------------
+        //---------------------------
         #region ----------itemsales
-        [HttpGet]
-        [Route("itemsales")]
-        public IEnumerable<_item_sales> itemsales()
-        {
-            return _item_sales.GetAll().OrderBy(o => o.item_sales_Id);
-        }
-        [Authorize(Roles = "Administrator")]
-        [HttpPost]
-        [Route("postitemsales")]
-        public async Task<IActionResult> postitemsales([FromBody] _item_sales p)
-        {
-            if (!ModelState.IsValid) { return BadRequest(ModelState); }
+        //[HttpGet]
+        //[Route("itemsales")]
+        //public IEnumerable<itemsales> itemsales()
+        //{
+        //    return _item_sales.GetAll().OrderBy(o => o.item_sales_Id);
+        //}
+        //[Authorize(Roles = "Administrator")]
+        //[HttpPost]
+        //[Route("postitemsales")]
+        //public async Task<IActionResult> postitemsales([FromBody] itemsales p)
+        //{
+        //    if (!ModelState.IsValid) { return BadRequest(ModelState); }
 
-            if (p.item_sales_Id != "")
-            {
-                var _p = _item_sales.GetAll().FirstOrDefault(x => x.item_sales_Id == p.item_sales_Id && x.item_Id == p.item_Id);
-                _p.item_sales_Id = _p.item_sales_Id;
-                _p.item_Id = p.item_Id;
-                _p.shipdet_Id = p.shipdet_Id;
-                _p.item_sale_date = p.item_sale_date;
-                await _item_sales.EditAsync(_p);
+        //    if (p.item_sales_Id != "")
+        //    {
+        //        var _p = _item_sales.GetAll().FirstOrDefault(x => x.item_sales_Id == p.item_sales_Id && x.item_Id == p.item_Id);
+        //        _p.item_sales_Id = _p.item_sales_Id;
+        //        _p.item_Id = p.item_Id;
+        //        _p.shipdet_Id = p.shipdet_Id;
+        //        _p.item_sale_date = p.item_sale_date;
+        //        await _item_sales.EditAsync(_p);
 
-                return Ok();
-            }
-            else
-            {
-                if (_item_sales.GetAll().FirstOrDefault(f => f.item_sales_Id == p.item_sales_Id && f.shipdet_Id == p.shipdet_Id) == null)
-                {
-                    var pp = new _item_sales();
-                    pp.item_sales_Id = Guid.NewGuid().ToString();
-                    pp.item_Id = p.item_Id;
-                    pp.shipdet_Id = p.shipdet_Id;
-                    pp.item_sale_date = DateTime.Now.Date;
-                    await _item_sales.InsertAsync(pp);
-                    return Ok();
-                }
-                else { return BadRequest(); }
-            }
-        }
-        [Authorize(Roles = "Administrator")]
-        [HttpPost]
-        [Route("delitemsales")]
-        public async Task<IActionResult> delitemsales([FromBody] _item_sales p)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-            var _p = _item_sales.GetAll().FirstOrDefault(f => f.item_sales_Id == p.item_sales_Id && f.shipdet_Id == p.shipdet_Id);
-            await _item_sales.DeleteAsync(_p);
-            return Ok();
-        }
+        //        return Ok();
+        //    }
+        //    else
+        //    {
+        //        if (_item_sales.GetAll().FirstOrDefault(f => f.item_sales_Id == p.item_sales_Id && f.shipdet_Id == p.shipdet_Id) == null)
+        //        {
+        //            var pp = new itemsales();
+        //            pp.item_sales_Id = Guid.NewGuid().ToString();
+        //            pp.item_Id = p.item_Id;
+        //            pp.shipdet_Id = p.shipdet_Id;
+        //            pp.item_sale_date = DateTime.Now.Date;
+        //            await _item_sales.InsertAsync(pp);
+        //            return Ok();
+        //        }
+        //        else { return BadRequest(); }
+        //    }
+        //}
+        //[Authorize(Roles = "Administrator")]
+        //[HttpPost]
+        //[Route("delitemsales")]
+        //public async Task<IActionResult> delitemsales([FromBody] itemsales p)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return BadRequest(ModelState);
+        //    }
+        //    var _p = _item_sales.GetAll().FirstOrDefault(f => f.item_sales_Id == p.item_sales_Id && f.shipdet_Id == p.shipdet_Id);
+        //    await _item_sales.DeleteAsync(_p);
+        //    return Ok();
+        //}
         #endregion
         #region ---------ShippingDetail
         [HttpGet]
         [Route("ShippingDetail")]
-        public IEnumerable<_ShippingDetail> ShippingDetail()
+        public IEnumerable<shipDetail> ShippingDetail()
         {
             return _ShippingDetail.GetAll().OrderBy(o => o.shipdet_Id);
         }
         [Authorize(Roles = "Administrator")]
         [HttpPost]
         [Route("postShippingDetail")]
-        public async Task<IActionResult> postShippingDetail([FromBody] _ShippingDetail p)
+        public async Task<IActionResult> postShippingDetail([FromBody] shipDetail p)
         {
             if (!ModelState.IsValid) { return BadRequest(ModelState); }
 
@@ -1379,7 +1389,7 @@ namespace OnBazar.Controllers
                 var _p = _ShippingDetail.GetAll().FirstOrDefault(x => x.shipdet_Id == p.shipdet_Id && x.userId == p.userId);
                 _p.shipdet_Id = _p.shipdet_Id;
                 _p.userId = p.userId;
-                _p.client_name = p.client_name;
+                //_p.client_name = p.client_name;
                 _p.client_sity = p.client_sity;
                 _p.client_strit = p.client_strit;
                 _p.client_house = p.client_house;
@@ -1394,10 +1404,10 @@ namespace OnBazar.Controllers
             {
                 if (_ShippingDetail.GetAll().FirstOrDefault(x => x.shipdet_Id == p.shipdet_Id && x.userId == p.userId) == null)
                 {
-                    var pp = new _ShippingDetail();
+                    var pp = new shipDetail();
                     pp.shipdet_Id = Guid.NewGuid().ToString();
                     pp.userId = p.userId;
-                    pp.client_name = p.client_name;
+                    //pp.client_name = p.client_name;
                     pp.client_sity = p.client_sity;
                     pp.client_strit = p.client_strit;
                     pp.client_house = p.client_house;
@@ -1413,7 +1423,7 @@ namespace OnBazar.Controllers
         [Authorize(Roles = "Administrator")]
         [HttpPost]
         [Route("delShippingDetail")]
-        public async Task<IActionResult> delShippingDetail([FromBody] _ShippingDetail p)
+        public async Task<IActionResult> delShippingDetail([FromBody] shipDetail p)
         {
             if (!ModelState.IsValid)
             {
@@ -1430,26 +1440,22 @@ namespace OnBazar.Controllers
         {
             return new string[] { "value1", "value2" };
         }
-
         // GET: api/Settings/5
         [HttpGet("{id}", Name = "Get")]
         public string Get(int id)
         {
             return "value";
         }
-
         // POST: api/Settings
         [HttpPost]
         public void Post([FromBody] string value)
         {
         }
-
         // PUT: api/Settings/5
         [HttpPut("{id}")]
         public void Put(int id, [FromBody] string value)
         {
         }
-
         // DELETE: api/ApiWithActions/5
         [HttpDelete("{id}")]
         public void Delete(int id)

@@ -246,11 +246,11 @@ namespace OnBazar.Controllers
                     if (_firma.GetAll().FirstOrDefault(f => f.userId == user.Id) == null)
                     {
                         var pp = new _firma();
-                        pp.firma_Id = Guid.NewGuid().ToString();
-                        pp.firma_name = user.UserName;
-                        pp.firma_telefon = "";
-                        pp.firma_unvan = "";
-                        pp.firma_email = user.Email;
+                        pp.firmaId = Guid.NewGuid().ToString();
+                        pp.firmaname = user.UserName;
+                        pp.firmatelefon = "";
+                        pp.firmaunvan = "";
+                        pp.firmaemail = user.Email;
                         pp.userId = user.Id;
                         await _firma.InsertAsync(pp);
 
@@ -696,26 +696,28 @@ namespace OnBazar.Controllers
                     throw new ApplicationException($"Unexpected error occurred setting email for user with ID '{user.Id}'.");
                 }
             }
-            var d = _firma.GetAll().FirstOrDefault(f => f.userId == user.Id && f.firma_email == user.Email);
+            var d = _firma.GetAll().FirstOrDefault(f => f.userId == user.Id && f.firmaemail == user.Email);
             var phoneNumber = user.PhoneNumber;
             if (d == null)
             {
                 var pp = new _firma();
-                pp.firma_Id = Guid.NewGuid().ToString();
-                pp.firma_name = user.UserName;
-                pp.firma_telefon = user.PhoneNumber;
-                pp.firma_unvan = "Owner";
-                pp.firma_email = user.Email;
+                pp.firmaId = Guid.NewGuid().ToString();
+                pp.firmaname = user.UserName;
+                pp.firmatelefon = model.PhoneNumber;
+                pp.firmaunvan = "Owner";
+                pp.firmaemail = user.Email;
                 pp.userId = user.Id;
                 await _firma.InsertAsync(pp);
-                return Ok();
+                //return Ok();
             }
-            else if (model.PhoneNumber != d.firma_telefon)
+            else if (model.PhoneNumber != d.firmatelefon )
             {
-                d.firma_Id = d.firma_Id;
-                d.firma_telefon = model.PhoneNumber;
+
+                d.firmaId = d.firmaId;
+                d.firmatelefon = model.PhoneNumber;
                 await _firma.EditAsync(d);
                 phoneNumber = model.PhoneNumber;
+               // return Ok();
             }
 
             //if (model.PhoneNumber != phoneNumber)

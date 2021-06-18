@@ -3,23 +3,9 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace OnBazar.Models
-{
-    public class MyClass
-    {
-    }
-    /* [Table("pages")]//счета-фактуры
-     public class Page
-     {
-         [Key]
-         [Required(AllowEmptyStrings = true), MaxLength(36)]
-         public string Pid { get; set; }
-         public string pagename { get; set; }
-
-
-     }*/
-   
-    [Table("Carts")]
-    public class Cart
+{    
+    [Table("pages")]
+    public class page
     {        
         [Key]
         [Required(AllowEmptyStrings = true), MaxLength(36)]

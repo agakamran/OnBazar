@@ -22,74 +22,74 @@ namespace OnBazar.Controllers
     [Produces("application/json")]
     [Route("api/[controller]")]
     [ApiController]
-    public class CartsController : ControllerBase
+    public class pageController : ControllerBase
     {
        // private readonly IHostingEnvironment _host;
         //private readonly IAntiforgery _antiforgery;
        // private readonly UserManager<ApplicationUser> _userManager;
         private readonly IRepository<Navbar> _na = null;
-        private readonly IRepository<Cart> _car = null;
+        private readonly IRepository<page> _car = null;
         private readonly IRepository<vido> _vi = null;
        // private readonly ApplicationDbContext _context;
 
-        public CartsController( //IHostingEnvironment host, IAntiforgery antiforgery, UserManager<ApplicationUser> userManager,
-             IRepository<Navbar> na,  IRepository<Cart> car, IRepository<vido> vi)
+        public pageController( //IHostingEnvironment host, IAntiforgery antiforgery, UserManager<ApplicationUser> userManager,
+             IRepository<Navbar> na,  IRepository<page> car, IRepository<vido> vi)
         {
           //  _host = host;
-            // _context = context;
-           // _antiforgery = antiforgery;
-            //_userManager = userManager;
+          // _context = context;
+          // _antiforgery = antiforgery;
+          //_userManager = userManager;
             _na = na;
             _car = car;
             _vi = vi;
         }
-      /*  [Authorize(Roles = "Administrator")]
+        [Authorize(Roles = "Administrator")]
         [HttpGet]
         [Route("_getpages")]
         public IEnumerable<Navbar> _getpages()
         {
-            return _pa.GetAll();
+            return _na.GetAll();
         }
         [Authorize(Roles = "Administrator")]
         [HttpPost]
         [Route("postpage")]
-        public async Task<IActionResult> postpage([FromBody] Page p)
+        public async Task<IActionResult> postpage([FromBody] page p)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            var _p = _pa.GetAll().FirstOrDefault(x => x.Pid == p.Pid);
+            var _p = _na.GetAll().FirstOrDefault(x => x.nid == p.nid);
             if (_p!= null)
             {
                             
-                _p.Pid = _p.Pid;
-                _p.pagename = p.pagename;      
-                await _pa.EditAsync(_p);
+                _p.nid = _p.nid;
+               // _p.pagename = p.pagename;      
+                await _na.EditAsync(_p);
                 return Ok();
             }
             else
             {
-                var pp = new Page();
-                pp.Pid = Guid.NewGuid().ToString();
-                pp.pagename = p.pagename;
-                await _pa.InsertAsync(pp);
+                var pp = new page();
+                pp.cid = Guid.NewGuid().ToString();
+               // pp.pagename = p.pagename;
+               // await _pa.InsertAsync(pp);
                 return Ok();
             }
         }
         [Authorize(Roles = "Administrator")]
         [HttpPost]
         [Route("delpage")]
-        public async Task<IActionResult> delpage([FromBody] Page p)
+        public async Task<IActionResult> delpage([FromBody] page p)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            var _p = _pa.GetAll().FirstOrDefault(x => x.Pid == p.Pid);
-            await _pa.DeleteAsync(_p);
+          //  var _p = _pa.GetAll().FirstOrDefault(x => x.Pid == p.Pid);
+           // await _pa.DeleteAsync(_p);
             return Ok();           
-        }*/
+        }
 
         [HttpPost]
         [Route("uplodeVidio")]
@@ -130,7 +130,7 @@ namespace OnBazar.Controllers
                     var _c = _car.GetAll().FirstOrDefault(x => x.nid ==_p.nid && x.clan==lang && x.charda==charda && x.csira==sira);                    
                     if (_c==null)
                     {
-                        var cc = new Cart();
+                        var cc = new page();
                         cc.cid = Guid.NewGuid().ToString();
                         cc.clan = lang;
                         cc.charda = charda;
@@ -156,7 +156,7 @@ namespace OnBazar.Controllers
         // GET: api/Carts
         [HttpPost]
         [Route("getCarts")]
-        public IEnumerable<Cart> getCarts([FromBody] Cart c)
+        public IEnumerable<page> getCarts([FromBody] page c)
         {
             if (c!=null){
                // int cc = _car.GetAll().Where(t=>t.harda==c.harda && t.pId == _pa.GetAll().LastOrDefault(h => h.pagename == c.pId).Pid).Count();
@@ -198,7 +198,7 @@ namespace OnBazar.Controllers
         [HttpPost]
         [Route("_getsay")]
         [Authorize(Roles = "Administrator")]
-        public int _getsay([FromBody] Cart cart)
+        public int _getsay([FromBody] page cart)
         {
            
             int Idt = 0;
@@ -282,7 +282,7 @@ namespace OnBazar.Controllers
         [HttpPost]
         [Route("PostCart")]
         [Authorize(Roles = "Administrator")]
-        public async Task<IActionResult> PostCart([FromBody] Cart cart)
+        public async Task<IActionResult> PostCart([FromBody] page cart)
         {
             if (!ModelState.IsValid)
             {
@@ -333,7 +333,7 @@ namespace OnBazar.Controllers
         [HttpPost]
         [Route("delcart")]
         [Authorize(Roles = "Administrator")]
-        public async Task<IActionResult> delcart([FromBody] Cart ca)
+        public async Task<IActionResult> delcart([FromBody] page ca)
         {
             if (!ModelState.IsValid)
             {

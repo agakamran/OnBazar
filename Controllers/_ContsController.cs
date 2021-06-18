@@ -15,13 +15,13 @@ namespace OnBazar.Controllers
     [Route("api/[controller]")]
     [ApiController]
     //[Authorize]
-    public class ContsController : ControllerBase
+    public class _ContsController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
         private readonly IRepository<Cont> _con = null;
         string format = "yyyy-MM-dd HH:mm:ss";
         string format1 = "yyyy-MM-dd";
-        public ContsController(ApplicationDbContext context, IRepository<Cont> con)
+        public _ContsController(ApplicationDbContext context, IRepository<Cont> con)
         {
             _context = context;
             _con = con;
@@ -33,7 +33,6 @@ namespace OnBazar.Controllers
         {
             return _con.GetAll();
         }
-
         // GET: api/Conts/5
         [HttpGet("{id}")]
         public async Task<IActionResult> GetCont([FromRoute] string id)
@@ -42,17 +41,14 @@ namespace OnBazar.Controllers
             {
                 return BadRequest(ModelState);
             }
-
             var cont = await _context.conts.FindAsync(id);
 
             if (cont == null)
             {
                 return NotFound();
             }
-
             return Ok(cont);
         }
-
         // PUT: api/Conts/5
         [HttpPut("{id}")]
         public async Task<IActionResult> PutCont([FromRoute] string id, [FromBody] Cont cont)
@@ -61,14 +57,11 @@ namespace OnBazar.Controllers
             {
                 return BadRequest(ModelState);
             }
-
             if (id != cont.cid)
             {
                 return BadRequest();
             }
-
             _context.Entry(cont).State = EntityState.Modified;
-
             try
             {
                 await _context.SaveChangesAsync();
