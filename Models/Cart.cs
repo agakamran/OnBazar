@@ -13,10 +13,10 @@ namespace OnBazar.Models
     {
         public List<CartLine> Lines { get; set; } = new List<CartLine>();
 
-        public virtual void AddItem(_itemdetail product, int quantity)
+        public virtual void AddItem(product product, int quantity)
         {
             CartLine line = Lines
-                .Where(p => p.Product.itemId == product.itemId)
+                .Where(p => p.Product.proId == product.proId)
                 .FirstOrDefault();
             if (line == null)
             {
@@ -31,17 +31,17 @@ namespace OnBazar.Models
                 line.Quantity += quantity;
             }
         }
-        public virtual void RemoveLine(_itemdetail product) =>
-            Lines.RemoveAll(l => l.Product.itemId == product.itemId);
-        public decimal ComputeTotalValue() =>
-            Lines.Sum(e => e.Product.salesprice * e.Quantity);
+        public virtual void RemoveLine(product product) =>
+            Lines.RemoveAll(l => l.Product.proId == product.proId);
+        public decimal ComputeTotalValue() => Lines.Sum(e => e.Product.sell_unitprice * e.Quantity);
 
         public virtual void Clear() => Lines.Clear();
     }
     public class CartLine
     {
         public int CartLineID { get; set; }
-        public _itemdetail Product { get; set; }
+        public product Product { get; set; }
+        public orderdet orderdet { get; set; }
         public int Quantity { get; set; }
     }
     public class CartIndexViewModel
@@ -66,13 +66,13 @@ namespace OnBazar.Models
         [JsonIgnore]
         public ISession Session { get; set; }
 
-        public override void AddItem(_itemdetail product, int quantity)
+        public override void AddItem(product product, int quantity)
         {
             base.AddItem(product, quantity);
             Session.SetJson("Cart", this);
         }
 
-        public override void RemoveLine(_itemdetail product)
+        public override void RemoveLine(product product)
         {
             base.RemoveLine(product);
             Session.SetJson("Cart", this);

@@ -37,11 +37,11 @@ namespace OnBazar.Models
     [Table("_bedens")]
     public class _beden
     {
-        public _beden()
-        {
-            this._genders = new HashSet<_gender>();
-            this._categoriys = new HashSet<_categoriy>();
-        }
+        //public _beden()
+        //{
+        //    this._genders = new HashSet<_gender>();
+        //    this._categoriys = new HashSet<_categoriy>();
+        //}
        
         [Key]
         [Required(AllowEmptyStrings = true), MaxLength(36)]
@@ -74,19 +74,19 @@ namespace OnBazar.Models
         public string uzunluk { get; set; }
         [Required, MaxLength(36)]
         public string catId { get; set; }
-        public virtual ICollection<_categoriy> _categoriys { get; set; }
+        public virtual IList<_categoriy> _categoriys { get; set; } = new List<_categoriy>();
         [Required, MaxLength(36)]
         public string genId { get; set; }
-        public virtual ICollection<_gender> _genders { get; set; }
-        
+        public virtual IList<_gender> _genders { get; set; } = new List<_gender>();
+
     }   
     [Table("_categoriys")]
     public class _categoriy{
-        public _categoriy()
-        {
-            this._genders = new HashSet<_gender>();
-        }
-        public virtual ICollection<_gender> _genders { get; set; }
+        //public _categoriy()
+        //{
+        //    this._genders = new HashSet<_gender>();
+        //}
+       
         [Key]
         [Required(AllowEmptyStrings = true), MaxLength(36)]
         public string catId { get; set; }
@@ -96,6 +96,7 @@ namespace OnBazar.Models
         public string catname { get; set; }
         [MaxLength(36)]
         public string genId { get; set; }
+        public virtual IList<_gender> _genders { get; set; }
     }
     [Table("_colors")]
     public class _color
@@ -174,10 +175,10 @@ namespace OnBazar.Models
     [Table("_qoltipis")]
     public class _qoltipi
     {
-        public _qoltipi()
-        {
-            this._genders = new HashSet<_gender>();
-        }
+        //public _qoltipi()
+        //{
+        //    this._genders = new HashSet<_gender>();
+        //}
         [Key]
         [Required(AllowEmptyStrings = true), MaxLength(36)]
         public string qolId { get; set; }
@@ -185,15 +186,15 @@ namespace OnBazar.Models
         public string qoltipiname { get; set; }
         [MaxLength(36)]
         public string genId { get; set; }
-        public virtual ICollection<_gender> _genders { get; set; }
+        public virtual IList<_gender> _genders { get; set; } = new List<_gender>();
     }   
     [Table("_yakas")]
     public class _yaka
     {
-        public _yaka()
-        {            
-            this._genders = new HashSet<_gender>();            
-        }
+        //public _yaka()
+        //{            
+        //    this._genders = new HashSet<_gender>();            
+        //}
         [Key]
         [Required(AllowEmptyStrings = true), MaxLength(36)]
         public string yakaId { get; set; }
@@ -201,7 +202,7 @@ namespace OnBazar.Models
         public string yakaname { get; set; }
         [MaxLength(36)]
         public string genId { get; set; }
-        public virtual ICollection<_gender> _genders { get; set; }
+        public virtual IList<_gender> _genders { get; set; }=new List<_gender>();
     }
     //--------------------------
     [Table("_qaimes")]
@@ -221,68 +222,68 @@ namespace OnBazar.Models
     [Table("_itemdetails")]
     public class _itemdetail
     {
-        public _itemdetail()
-        {
-            this._firmas = new HashSet<_firma>();
-            this._genders = new HashSet<_gender>();
-            this._categoriys = new HashSet<_categoriy>();
-            this._markas = new HashSet<_marka>();
-            this._bedens = new HashSet<_beden>();
-            this._colors = new HashSet<_color>();
-            this._qelips = new HashSet<_qelip>();
-            this._materials = new HashSet<_material>();
-            this._yakas = new HashSet<_yaka>();
-            this._qoltipis = new HashSet<_qoltipi>();
-            this._stils = new HashSet<_stil>();
-            this._desens = new HashSet<_desen>();
-            this._kullanimAlanis = new HashSet<_kullanimAlani>();
-            this._kumashtipis = new HashSet<_kumashtipi>();
-        }
+        //public _itemdetail()
+        //{
+        //    this._firmas = new HashSet<_firma>();
+        //    this._genders = new HashSet<_gender>();
+        //    this._categoriys = new HashSet<_categoriy>();
+        //    this._markas = new HashSet<_marka>();
+        //    this._bedens = new HashSet<_beden>();
+        //    this._colors = new HashSet<_color>();
+        //    this._qelips = new HashSet<_qelip>();
+        //    this._materials = new HashSet<_material>();
+        //    this._yakas = new HashSet<_yaka>();
+        //    this._qoltipis = new HashSet<_qoltipi>();
+        //    this._stils = new HashSet<_stil>();
+        //    this._desens = new HashSet<_desen>();
+        //    this._kullanimAlanis = new HashSet<_kullanimAlani>();
+        //    this._kumashtipis = new HashSet<_kumashtipi>();
+        //}
         [Key]
         [Required(AllowEmptyStrings = true), MaxLength(36)]
         public string itemId { get; set; }       
         [Required, MaxLength(36)]
         public string firmaId { get; set; }
-        public virtual ICollection<_firma> _firmas { get; set; }
+        public virtual IList<_firma> _firmas { get; set; } = new List<_firma>();
         [ MaxLength(36)]
         public string genId { get; set; }
-        public virtual ICollection<_gender> _genders { get; set; }
+        public virtual IList<_gender> _genders { get; set; } = new List<_gender>();
         [ MaxLength(36)]
         public string catId { get; set; }
-        public virtual ICollection<_categoriy> _categoriys { get; set; }
+        public virtual IList<_categoriy> _categoriys { get; set; } = new List<_categoriy>();
         [MaxLength(36)]
         public string markaId { get; set; }
-        public virtual ICollection<_marka> _markas { get; set; }
+        public virtual IList<_marka> _markas { get; set; } = new List<_marka>();
         [MaxLength(36)]
         public string bedenId { get; set; }
-        public virtual ICollection<_beden> _bedens { get; set; }
+        public virtual IList<_beden> _bedens { get; set; } = new List<_beden>();
         [ MaxLength(36)]
         public string colId { get; set; }
-        public virtual ICollection<_color> _colors { get; set; }
+        public virtual IList<_color> _colors { get; set; } = new List<_color>();
         [MaxLength(36)]
         public string qelipId { get; set; }
-        public virtual ICollection<_qelip> _qelips { get; set; }
+        public virtual IList<_qelip> _qelips { get; set; } = new List<_qelip>();
         [ MaxLength(36)]
         public string matId { get; set; }
-        public virtual ICollection<_material> _materials { get; set; }
+        public virtual IList<_material> _materials { get; set; } = new List<_material>();
         [MaxLength(36)]
         public string yakaId { get; set; }
-        public virtual ICollection<_yaka> _yakas { get; set; }
+        public virtual IList<_yaka> _yakas { get; set; } = new List<_yaka>();
         [MaxLength(36)]
         public string qolId { get; set; }
-        public virtual ICollection<_qoltipi> _qoltipis { get; set; }
+        public virtual IList<_qoltipi> _qoltipis { get; set; } = new List<_qoltipi>();
         [MaxLength(36)]
         public string stilId { get; set; }
-        public virtual ICollection<_stil> _stils { get; set; }
+        public virtual IList<_stil> _stils { get; set; } = new List<_stil>();
         [MaxLength(36)]
         public string desId { get; set; }
-        public virtual ICollection<_desen> _desens { get; set; }
+        public virtual IList<_desen> _desens { get; set; } = new List<_desen>();
         [MaxLength(36)]
         public string kulalanId { get; set; }
-        public virtual ICollection<_kullanimAlani> _kullanimAlanis { get; set; }
+        public virtual IList<_kullanimAlani> _kullanimAlanis { get; set; } = new List<_kullanimAlani>();
         [MaxLength(36)]
         public string kumashId { get; set; }
-        public virtual ICollection<_kumashtipi> _kumashtipis { get; set; }       
+        public virtual IList<_kumashtipi> _kumashtipis { get; set; } = new List<_kumashtipi>();
         [ MaxLength(250)]
         public string itemname { get; set; }
         [MaxLength(25)]

@@ -12,8 +12,9 @@ namespace OnBazar.Models
         public string LastName { get; set; }
         public long? providerId { get; set; }
         public long? providername { get; set; }
-        public string photoUrl { get; set; }
+        public string photoUrl { get; set; }          
         public string IP { get; set; }
+        public decimal percent { get; set; } = 0;
         [JsonIgnore]
         public List<RefreshToken> RefreshTokens { get; set; }
         // public string MacAdd { get; set; }

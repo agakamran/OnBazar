@@ -7,7 +7,7 @@ namespace OnBazar.Models.ViewModels
 {
     public class ProductsListViewModel
     {
-        public IEnumerable<_itemdetail> Products { get; set; }
+        public IEnumerable<product> Products { get; set; }
         public PagingInfo PagingInfo { get; set; }
         public string CurrentCategory { get; set; }
     }

@@ -29,7 +29,7 @@ namespace OnBazar.Controllers
     // [EnableCors("AllowOrigin")]
     public class AccountController : Controller
     {
-        private readonly IRepository<_firma> _firma = null;
+        private readonly IRepository<store> _firma = null;
         private readonly ApplicationDbContext db;
         // private readonly IAntiforgery _antiforgery;
         private readonly UserManager<ApplicationUser> _userManager;
@@ -52,7 +52,7 @@ namespace OnBazar.Controllers
 
 
         public AccountController(
-            IRepository<_firma> firma,
+            IRepository<store> firma,
             ApplicationDbContext _db,
             //  IAntiforgery antiforgery,
             //  IRepository<payment> pa,  IRepository<Customer> cu, IRepository<Price> pr,  IRepository<invoice> inv,     IHostingEnvironment hostingEnvironment,
@@ -120,6 +120,7 @@ namespace OnBazar.Controllers
                             photoUrl = user.photoUrl,
                             isEmailConfirmed = user.EmailConfirmed,
                             PhoneNumber = user.PhoneNumber,
+                            percent=user.percent,
                             token = tokenString,
                             mesage = ""
                         };
@@ -245,12 +246,12 @@ namespace OnBazar.Controllers
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     if (_firma.GetAll().FirstOrDefault(f => f.userId == user.Id) == null)
                     {
-                        var pp = new _firma();
-                        pp.firmaId = Guid.NewGuid().ToString();
-                        pp.firmaname = user.UserName;
-                        pp.firmatelefon = "";
-                        pp.firmaunvan = "";
-                        pp.firmaemail = user.Email;
+                        var pp = new store();
+                        pp.storId = Guid.NewGuid().ToString();
+                        pp.storname = user.UserName;
+                        pp.storphone = "";
+                        pp.storadress = "";
+                        pp.storemail = user.Email;
                         pp.userId = user.Id;
                         await _firma.InsertAsync(pp);
 
@@ -696,42 +697,37 @@ namespace OnBazar.Controllers
                     throw new ApplicationException($"Unexpected error occurred setting email for user with ID '{user.Id}'.");
                 }
             }
-            var d = _firma.GetAll().FirstOrDefault(f => f.userId == user.Id && f.firmaemail == user.Email);
+            var d = _firma.GetAll().FirstOrDefault(f => f.userId == user.Id && f.storemail == user.Email);
             var phoneNumber = user.PhoneNumber;
             if (d == null)
             {
-                var pp = new _firma();
-                pp.firmaId = Guid.NewGuid().ToString();
-                pp.firmaname = user.UserName;
-                pp.firmatelefon = model.PhoneNumber;
-                pp.firmaunvan = "Owner";
-                pp.firmaemail = user.Email;
+                var pp = new store();
+                pp.storId = Guid.NewGuid().ToString();
+                pp.storname = user.UserName;
+                pp.storphone = model.PhoneNumber;
+                pp.storadress = "Owner";
+                pp.storemail = user.Email;
+              //  pp.storpercent = model.percent;
                 pp.userId = user.Id;
                 await _firma.InsertAsync(pp);
                 //return Ok();
             }
-            else if (model.PhoneNumber != d.firmatelefon )
+            else if (model.PhoneNumber != d.storphone )//|| d.storpercent != model.percent
             {
-
-                d.firmaId = d.firmaId;
-                d.firmatelefon = model.PhoneNumber;
+                d.storId = d.storId;
+                d.storphone = model.PhoneNumber;
+               // if (d.storpercent != model.percent) { d.storpercent = model.percent; }
                 await _firma.EditAsync(d);
                 phoneNumber = model.PhoneNumber;
                // return Ok();
             }
-
-            //if (model.PhoneNumber != phoneNumber)
-            //{
-            //    var setPhoneResult = await _userManager.SetPhoneNumberAsync(user, model.PhoneNumber);
-            //    if (!setPhoneResult.Succeeded)
-            //    {
-            //        throw new ApplicationException($"Unexpected error occurred setting phone number for user with ID '{user.Id}'.");
-            //    }
-            //}
-            if (model.photoUrl != user.photoUrl || model.PhoneNumber != phoneNumber)
+            if (model.photoUrl != user.photoUrl || model.PhoneNumber != phoneNumber || user.percent != model.percent)
             {
-                var setPhoneResult = await _userManager.SetPhoneNumberAsync(user, model.PhoneNumber);
+                //var setPhoneResult = await _userManager.SetPhoneNumberAsync(user, model.PhoneNumber);
+                user.PhoneNumber = model.PhoneNumber;
                 user.photoUrl = model.photoUrl;
+                user.percent = model.percent;
+               
                 var setphotoUrl = await _userManager.UpdateAsync(user);
                 if (!setphotoUrl.Succeeded)
                 {

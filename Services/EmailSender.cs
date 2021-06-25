@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Options;
 using OnBazar.Models;
-using OnBazar.Models.Abstract;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -93,20 +92,20 @@ namespace OnBazar.Services
     }
     public interface IOrderProcessor
     {
-        void ProcessOrder(Cart cart, shipDetail shipDetails);
+        void ProcessOrder(Cart cart, shipper shipDetails);
     }
     public class EmailOrderProcessor : IOrderProcessor
     {
         private EmailSettings emailSettings;
         private readonly IRepository<orderm> _orderm = null;
-        private readonly IRepository<orderd> _orderd = null;
-        public EmailOrderProcessor(EmailSettings settings, IRepository<orderm> orderm, IRepository<orderd> orderd)
+        private readonly IRepository<orderdet> _orderd = null;
+        public EmailOrderProcessor(EmailSettings settings, IRepository<orderm> orderm, IRepository<orderdet> orderd)
         {
             emailSettings = settings;
             _orderm = orderm;
             _orderd = orderd;
         }
-        public void ProcessOrder(Cart cart, shipDetail shippingInfo)
+        public void ProcessOrder(Cart cart, shipper shippingInfo)
         {
             string path = System.IO.Directory.GetCurrentDirectory();
             using (var smtpClient = new SmtpClient())
@@ -128,19 +127,19 @@ namespace OnBazar.Services
                 .AppendLine("Items:");
                 foreach (var line in cart.Lines)
                 {
-                    var subtotal = line.Product.salesprice * line.Quantity;
+                    var subtotal = line.Product.sell_unitprice * line.Quantity;
                     body.AppendFormat("{0} x {1} (subtotal: {2:c}", line.Quantity,
-                    line.Product.itemname, subtotal);
+                    line.Product.prodname, subtotal);
                 }            
                 body.AppendFormat("Total order value: {0:c}", cart.ComputeTotalValue())
                 .AppendLine("---")
                 .AppendLine("Ship to:")
                // .AppendLine(shippingInfo.client_name)
-                .AppendLine(shippingInfo.client_sity)
-                .AppendLine(shippingInfo.client_strit ?? "")
-                .AppendLine(shippingInfo.client_house ?? "")
-                .AppendLine(shippingInfo.client_flat)
-                .AppendLine(shippingInfo.client_phone ?? "")
+                .AppendLine(shippingInfo.shipsity)
+                .AppendLine(shippingInfo.shipstrit ?? "")
+                .AppendLine(shippingInfo.shiphouse ?? "")
+               // .AppendLine(shippingInfo.shipflat)
+                .AppendLine(shippingInfo.shipphone ?? "")
                // .AppendLine(shippingInfo.Country)
                // .AppendLine(shippingInfo.Zip)
                 .AppendLine("---")
@@ -158,31 +157,31 @@ namespace OnBazar.Services
 
                 //----------Master-------------------------------------       
                 orderm sm = new orderm();
-                sm.ormID = Guid.NewGuid().ToString();
+                sm.ormId = Guid.NewGuid().ToString();
                // sm.ordName = shippingInfo.client_name;
-                sm.Unvan = shippingInfo.client_sity;
-                sm.ordTelefon = shippingInfo.client_phone;
-                sm.otptarix = System.DateTime.Now;
+                //sm.Unvan = shippingInfo.client_sity;
+                //sm.ordTelefon = shippingInfo.client_phone;
+                //sm.otptarix = System.DateTime.Now;
                 // sm.otptarix = System.Convert.ToDateTime("01/01/2015");
                 sm.summ = cart.ComputeTotalValue();
-                sm.getdi = false;
+                //sm.getdi = false;
                 _orderm.InsertAsync(sm);
                 //var sonmas = repository.SifMByID(cart.ComputeTotalValue());
                 // var iid = sonmas.SifID;
                 //-----------------------------------------------
                 foreach (var line in cart.Lines)
                 {
-                    orderd sif = new orderd();
+                    orderdet sif = new orderdet();
                     ////------Detal-------------------            
-                    sif.Prodname = line.Product.itemname;
-                    sif.Qountity = line.Quantity;
-                    sif.Price = line.Product.salesprice;
-                    sif.ormID = sm.ormID;
+                    //sif.Prodname = line.Product.itemname;
+                    //sif.Qountity = line.Quantity;
+                    //sif.Unitselprice = line.Product.salesprice;
+                    //sif.ormID = sm.ormID;
                     _orderd.InsertAsync(sif);
                     //-------------------------
-                    var subtotal = line.Product.salesprice * line.Quantity;
+                    var subtotal = line.Product.sell_unitprice * line.Quantity;
                     body.AppendFormat("{0} x {1} (Aralıq məbləğ: {2:c})\n", line.Quantity,
-                    line.Product.itemname, subtotal);
+                    line.Product.prodname, subtotal);
                 }
             }
         }        

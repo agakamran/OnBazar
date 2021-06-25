@@ -60,5 +60,6 @@ namespace OnBazar.Models.AccountViewModels
         public string PhoneNumber { get; set; }
         public string photoUrl { get; set; }
         public string StatusMessage { get; set; }
+        public decimal percent { get; set; }
     }
 }

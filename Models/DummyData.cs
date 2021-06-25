@@ -16,8 +16,8 @@ namespace OnBazar.Models
     
     public class DummyData
     {
-        private readonly IRepository<_firma> _firma = null;
-          public DummyData(IRepository<_firma> firma//, IRepository<Navbar> nav, IRepository<NavbarRole> navrol
+        private readonly IRepository<store> _firma = null;
+          public DummyData(IRepository<store> firma//, IRepository<Navbar> nav, IRepository<NavbarRole> navrol
               )
           {
            // _firma = firma;

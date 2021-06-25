@@ -13,10 +13,10 @@ namespace OnBazar.Models.Abstract
     [Table("orderms")]
     public class orderm
     {
-        public orderm()
-        {
-            this.orderds = new HashSet<orderd>();
-        }
+        //public orderm()
+        //{
+        //    this.orderds = new HashSet<orderd>();
+        //}
         [HiddenInput(DisplayValue = false)]
         [Key]
         [Required(AllowEmptyStrings = true), MaxLength(36)]
@@ -28,15 +28,15 @@ namespace OnBazar.Models.Abstract
         public DateTime otptarix { get; set; }
         public decimal summ { get; set; }
         public bool getdi { get; set; }
-        public virtual ICollection<orderd> orderds { get; set; }
+       // public virtual ICollection<orderd> orderds { get; set; }
     }
     [Table("orderds")]
     public class orderd
     {
-        public orderd()
-        {
-            this.orderms = new HashSet<orderm>();
-        }
+        //public orderd()
+        //{
+        //    this.orderms = new HashSet<orderm>();
+        //}
         [HiddenInput(DisplayValue = false)]
         [Key]
         [Required(AllowEmptyStrings = true), MaxLength(36)]
@@ -46,7 +46,7 @@ namespace OnBazar.Models.Abstract
         public decimal Price { get; set; }
         [MaxLength(36)]
         public string ormID { get; set; }
-        public virtual ICollection<orderm> orderms { get; set; }
+        public virtual IList<orderm> orderms { get; set; } = new List<orderm>();
     }
     [Table("shipDetails")]
     public class shipDetail
