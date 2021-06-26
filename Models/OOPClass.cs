@@ -174,7 +174,7 @@ namespace OnBazar.Models
         public string storemail { get; set; }
         [Required, MaxLength(36)]
         public string userId { get; set; }
-        public decimal storpercent { get; set; } = 0;
+        //public decimal storpercent { get; set; } = 0;
         public int storvoen { get; set; }
         public DateTime ModifiedDate { get; set; } = DateTime.Now;
     }
@@ -289,7 +289,7 @@ namespace OnBazar.Models
         public bool Discontinued { get; set; }       //Снято с производства
         [Required, MaxLength(10)]
         public string opr { get; set; }               //emeliyyat  
-        //public bool delivery { get; set; } //dastavka
+        public bool delivery { get; set; } //dastavka
         //--------------------------------------------------------------------------
     }
     

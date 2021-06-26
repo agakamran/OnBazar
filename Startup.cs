@@ -38,6 +38,15 @@ namespace OnBazar
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            //int k = 0;
+            //int[] mas = { 1, 2, 4, 2, 5, 1, 5 };
+            //int[] mas1 =new int[mas.Length*2];
+            //for (int i = 0; i < mas.Length; i++)
+            //{
+            //    mas1[mas[i]] = mas[i];
+            //}
+
+
             services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(
             Configuration.GetConnectionString("DefaultConnection")));
             services.AddDbContext<ApplicationDbContext>(ServiceLifetime.Transient);
