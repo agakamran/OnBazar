@@ -36,8 +36,20 @@ namespace Webschool.Controllers
         public IEnumerable<Navbar> _getnav()
         {
             // menu();
-            return _context.navbars//.Where(r => r.pid == null)
-            .OrderBy(o => o.ink);
+            //Navbar res = _context.navbars;
+            //var data = new
+            //{
+            //    nid = res.nid,
+            //    pid = res.pid,
+            //    ntitle = res.ntitle,
+            //    npath = res.npath,
+            //    nlan = res.nlan,
+            //    nicon = res.nicon,
+            //    ink = res.ink,
+            //    nisparent = res.nisparent,
+            //    nrol = res.nrol
+            //};
+            return _context.navbars.OrderBy(o => o.ink);
         }
         /*  public void menu()
           {
@@ -109,8 +121,8 @@ namespace Webschool.Controllers
 
         //  [Authorize(Roles = "Administrator")]
         [HttpPost]
-        [Route("_getnavbar")]
-        public IEnumerable _getnavbar([FromBody] string[] rol)
+        [Route("_getnavbar")]  //esas
+        public IActionResult _getnavbar([FromBody] string[] rol)
         {
             //  if (rol.Contains("User") == false) { rol[0] = "User"; }    
             var res = (from a in _nav.GetAll()
@@ -132,8 +144,20 @@ namespace Webschool.Controllers
                            c.Id,
                            c.Name
                        });
+           
             int dd = res.Count();
-            return res.OrderBy(o => o.ink).ToList();
+            // var use = new {
+            // nid=res.nid,
+            // pid= res.pid,
+            // npath= res.npath,
+            // nicon= res.nicon,
+            // nlan= res.nlan,
+            // ncsay= res.ncsay,
+            // nrol= res.nrol,
+            // ink= res.ink,
+            // nisparent= res.nisparent
+            //}
+            return Ok( res.OrderBy(o => o.ink).ToList());
         }
         [HttpGet]
         [Route("_getRoles")]

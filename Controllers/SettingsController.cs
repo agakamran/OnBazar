@@ -1227,7 +1227,7 @@ namespace OnBazar.Controllers
         }
         #endregion
         #region ----------items_photo--------------------------------------------
-        [Authorize]
+        
         [HttpPost]
         [Route("uplodeAvatar")]
         public async Task<IActionResult> uplodeAvatar()

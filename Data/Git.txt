@@ -8,7 +8,7 @@ git push -u origin main
 ---------git Gonder--------------
 git add -A
 git commit -m "jjjj"
-git push origin master
+git push origin main
 ------gitqebul et--------------------- 
 git clone // tam proyekti gotur
 git pull origin main //yeniliyi dart
