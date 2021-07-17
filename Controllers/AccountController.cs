@@ -182,7 +182,7 @@ namespace OnBazar.Controllers
                 _config["Jwt:Issuer"],
                 claims,
                 //IsExpired: DateTime.Now,
-                expires: DateTime.Now.AddMinutes(20),
+                expires: DateTime.Now.AddMinutes(90),
                 signingCredentials: creds);
             return new JwtSecurityTokenHandler().WriteToken(token);
         }

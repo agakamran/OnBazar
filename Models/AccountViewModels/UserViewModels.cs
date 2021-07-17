@@ -18,15 +18,11 @@ namespace OnBazar.Models
         public string Password { get; set; }
 
     }
-    //public class LoginModel
-    //{
-    //    [Required]
-    //    [UIHint("email")]
-    //    public string Email { get; set; }
-    //    [Required]
-    //    [UIHint("password")]
-    //    public string Password { get; set; }
-    //}
+    public class UserRole
+    {        
+        public string UserId { get; set; }        
+        public string RoleId { get; set; }
+    }
     public class Role
     {
         public string id { get; set; }

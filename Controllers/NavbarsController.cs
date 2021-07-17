@@ -22,13 +22,18 @@ namespace Webschool.Controllers
         private readonly IRepository<Navbar> _nav = null;
         private readonly IRepository<NavbarRole> _navrol = null;
         private RoleManager<IdentityRole> _roleManager;
+        private readonly IRepository<Role> _rol = null;
+        private readonly IRepository<UserRole> _userol = null; 
         public NavbarsController(ApplicationDbContext context, IRepository<Navbar> nav,
+            IRepository<Role> rol, IRepository<UserRole> userol,
             IRepository<NavbarRole> navrol, RoleManager<IdentityRole> roleMgr)
         {
             _context = context;
             _nav = nav;
             _navrol = navrol;
             _roleManager = roleMgr;
+            _rol = rol;
+            _userol = userol;
         }
         // GET: api/Navbars
         [HttpGet]
@@ -161,11 +166,41 @@ namespace Webschool.Controllers
         }
         [HttpGet]
         [Route("_getRoles")]
-        public IActionResult _getRoles()
-        {
-            var roles = _roleManager.Roles.ToList();
-            return Ok(roles);
+        public IActionResult _getRoles(string use)
+        {            
+            var res = (from ro in _roleManager.Roles.ToList()
+            join usr in _context.UserRoles on ro.Id equals usr.RoleId                       
+            where usr.UserId == use
+                       select new
+                       {
+                           ro.Id,
+                           ro.Name,
+                           ro.NormalizedName,
+                           usr.UserId
+                       });
+            return Ok(res.ToList());
         }
+        // select ro.id,ro.name,usro.RoleId, case when usro.RoleId is null then 'false' when usro.RoleId is not null then 'true' end as checked from[dbo].[AspNetRoles] ro
+        //left join[dbo].[AspNetUserRoles] usro on usro.RoleId = ro.Id
+
+        //var res = (from ro in _roleManager.Roles.ToList()
+        //           join usro in _context.UserRoles on ro.Id equals usro.RoleId into ur
+        //          // join usro in _userol.GetAll() on ro.Id equals usro.RoleId into ur
+        //           from _ur in ur.DefaultIfEmpty()
+        //           where _ur.UserId == use
+        //           select new
+        //           {
+        //               ro.Id,
+        //               ro.Name,
+        //               ro.NormalizedName,
+        //               _ur.RoleId,
+        //               _ur.UserId
+        //           })
+        //.GroupBy(t => t.RoleId).Select(p => new {
+        //    Count = p.Count(),
+        //    RoleId = p.Key == "" ? "false" : p.Key != "" ? "true" : "checked"
+        //});
+        //return Ok(res.ToList());
         [Authorize(Roles = "Administrator")]
         [HttpPost]
         [Route("postmenu")]
@@ -192,13 +227,17 @@ namespace Webschool.Controllers
                 _p.nisparent = p.nisparent;
                 _p.nicon = p.nicon;
                 _p.nrol = p.nrol;
-                await _nav.EditAsync(_p);               
+                await _nav.EditAsync(_p);
                 //=============================
-                var nr = _navrol.GetAll().FirstOrDefault(y => y.nid == p.nid);
-                IdentityRole role = await _roleManager.FindByNameAsync(p.nrol);//"User"
-                nr.RoleId = role.Id;
-                // nr.RoleId = nr.nid;               
-                await _navrol.EditAsync(nr);
+                if (p.nrol != "true")
+                {
+                    var nr = _navrol.GetAll().FirstOrDefault(y => y.nid == p.nid);
+                    IdentityRole role = await _roleManager.FindByNameAsync(p.nrol);//"User"
+                    nr.RoleId = role.Id;
+                    // nr.RoleId = nr.nid;               
+                    await _navrol.EditAsync(nr);
+                }
+               
                 return Ok();
             }
             else
@@ -229,21 +268,24 @@ namespace Webschool.Controllers
                     pp.nrol = p.nrol;
                     if (p.ink != 0) { pp.ink = p.ink; }
                     else { pp.ink = Idt + 1; }
-
-
                     await _nav.InsertAsync(pp);
                     //=============================
-                    var nr = new NavbarRole();
-                    nr.nrid = Guid.NewGuid().ToString();
-                    nr.nid = pp.nid;
-                    IdentityRole role = await _roleManager.FindByNameAsync(p.nrol);//"User"
-                    nr.RoleId = role.Id;
-                    await _navrol.InsertAsync(nr);
+                    if (p.nrol != "")
+                    {
+                        var nr = new NavbarRole();
+                        nr.nrid = Guid.NewGuid().ToString();
+                        nr.nid = pp.nid;
+                        IdentityRole role = await _roleManager.FindByNameAsync(p.nrol);//"User"
+                        nr.RoleId = role.Id;
+                        await _navrol.InsertAsync(nr);
+                    }
+                    
                     return Ok();
                 }
                 else { return BadRequest(); }
             }
         }
+        
         [Authorize(Roles = "Administrator")]
         [HttpPost]
         [Route("delmenu")]
@@ -262,11 +304,33 @@ namespace Webschool.Controllers
         //-------------------------------------------------------------------------------
         [Authorize(Roles = "Administrator")]
         [HttpGet]
-        [Route("_getnavbar")]
+        [Route("_getnrol")]
+        public IEnumerable _getnrol(string rol)
+        {
+            string xx = "";
+            if(rol!="Op"){  xx = "where c.Name.Contains(" + rol + ")";  }
+
+            var res = (from a in _nav.GetAll()
+                       join b in _navrol.GetAll() on a.nid equals b.nid into nro                       
+                       from _ur in nro.DefaultIfEmpty()
+                       join c in _context.Roles on _ur.RoleId equals c.Id into rr
+                       from _rr in rr.DefaultIfEmpty()
+                       + xx                     
+                      // where c.Name.Contains(rol)
+                       select new
+                       {
+                           _ur.nid ,
+                           _ur.RoleId ,
+                           _rr.Name ,
+                           a.ntitle                           
+                       });
+            return res.ToList();
+        }
+        [Authorize(Roles = "Administrator")]
+        [HttpGet]
+        [Route("_getnavrol")]
         public IEnumerable _getnavrol()
         {
-
-
             var res = (from a in _nav.GetAll()
                        join b in _navrol.GetAll() on a.nid equals b.nid
                        join c in _context.Roles on b.RoleId equals c.Id
@@ -293,30 +357,34 @@ namespace Webschool.Controllers
             {
                 return BadRequest(ModelState);
             }
-            if (nr.nid != "")
-            {
-                var _nr = _navrol.GetAll().FirstOrDefault(x => x.nid == nr.nid && x.RoleId == nr.RoleId);
-                _nr.nid = nr.nid;
-                _nr.RoleId = nr.RoleId;
-                await _navrol.EditAsync(_nr);
-                return Ok();
-            }
-            else
+            //if (nr.nid != "")
+            //{
+            //    var _nr = _navrol.GetAll().FirstOrDefault(x => x.nid == nr.nid && x.RoleId == nr.RoleId);
+            //    _nr.nid = nr.nid;
+            //    _nr.RoleId = nr.RoleId;
+            //    await _navrol.EditAsync(_nr);
+            //    return Ok();
+            //}
+            //else
+            //{
+            if (nr.nid != "" && nr.RoleId != null)
             {
                 var _nr = new NavbarRole();
                 _nr.nrid = Guid.NewGuid().ToString();
                 _nr.nid = nr.nid;
                 _nr.RoleId = nr.RoleId;
                 await _navrol.InsertAsync(_nr);
-                return Ok();
             }
+               
+                return Ok();
+            //}
         }
 
         // POST: api/Menu
         [Authorize(Roles = "Administrator")]
-        [HttpPost]
-        [Route("_delnavrol")]
-        public async Task<IActionResult> _delnavrol([FromBody] NavbarRole nr)
+        [HttpGet]
+        [Route("_delnrol")]
+        public async Task<IActionResult> _delnrol(string nr)
         {
             if (!ModelState.IsValid)
             {
@@ -324,8 +392,30 @@ namespace Webschool.Controllers
             }
             else
             {
-                var _nr = _navrol.GetAll().FirstOrDefault(x => x.nid == nr.nid && x.RoleId == nr.RoleId);
-                await _navrol.DeleteAsync(_nr);
+                var _nr = _navrol.GetAll().Where(x => x.RoleId == nr).ToArray();
+                foreach(var f in _nr){
+                    await _navrol.DeleteAsync(f);
+                }                
+                return Ok();
+            }
+        }
+        // POST: api/Menu
+        [Authorize(Roles = "Administrator")]
+        [HttpGet]
+        [Route("_delnavrol")]
+        public async Task<IActionResult> _delnavrol(string nr)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            else
+            {
+                var _nr = _navrol.GetAll().Where(x => x.nid == nr).ToArray();
+                foreach (var f in _nr)
+                {
+                    await _navrol.DeleteAsync(f);
+                }
                 return Ok();
             }
         }
