@@ -38,23 +38,9 @@ namespace Webschool.Controllers
         // GET: api/Navbars
         [HttpGet]
         [Route("_getnav")]
-        public IEnumerable<Navbar> _getnav()
-        {
-            // menu();
-            //Navbar res = _context.navbars;
-            //var data = new
-            //{
-            //    nid = res.nid,
-            //    pid = res.pid,
-            //    ntitle = res.ntitle,
-            //    npath = res.npath,
-            //    nlan = res.nlan,
-            //    nicon = res.nicon,
-            //    ink = res.ink,
-            //    nisparent = res.nisparent,
-            //    nrol = res.nrol
-            //};
-            return _context.navbars.OrderBy(o => o.ink);
+        public IQueryable<Navbar> _getnav()
+        {           
+            return _nav.GetAll().OrderBy(o => o.ink);
         }
         /*  public void menu()
           {
@@ -147,21 +133,12 @@ namespace Webschool.Controllers
                            a.ncsay,
                            a.nrol,
                            c.Id,
-                           c.Name
+                           c.Name,
+                           isChecked=false
                        });
            
             int dd = res.Count();
-            // var use = new {
-            // nid=res.nid,
-            // pid= res.pid,
-            // npath= res.npath,
-            // nicon= res.nicon,
-            // nlan= res.nlan,
-            // ncsay= res.ncsay,
-            // nrol= res.nrol,
-            // ink= res.ink,
-            // nisparent= res.nisparent
-            //}
+            
             return Ok( res.OrderBy(o => o.ink).ToList());
         }
         [HttpGet]
@@ -302,28 +279,29 @@ namespace Webschool.Controllers
             return Ok();
         }
         //-------------------------------------------------------------------------------
-        [Authorize(Roles = "Administrator")]
+       // [Authorize(Roles = "Administrator")]
         [HttpGet]
         [Route("_getnrol")]
         public IEnumerable _getnrol(string rol)
         {
-            string xx = "";
-            if(rol!="Op"){  xx = "where c.Name.Contains(" + rol + ")";  }
+           // string xx = "";
+            //if(rol!="Op"){  xx = "where c.Name.Contains(" + rol + ")";  }
 
             var res = (from a in _nav.GetAll()
                        join b in _navrol.GetAll() on a.nid equals b.nid into nro                       
-                       from _ur in nro.DefaultIfEmpty()
-                       join c in _context.Roles on _ur.RoleId equals c.Id into rr
-                       from _rr in rr.DefaultIfEmpty()
-                       + xx                     
-                      // where c.Name.Contains(rol)
+                       from _b in nro.DefaultIfEmpty()
+                       join c in _roleManager.Roles on _b.RoleId equals c.Id 
+                      // from _c in tt.DefaultIfEmpty()
+                      // + xx                     
+                       where c.Name.Contains(rol)
                        select new
                        {
-                           _ur.nid ,
-                           _ur.RoleId ,
-                           _rr.Name ,
+                           _b.nid ,
+                           id= _b.RoleId ,
+                           c.Name,
                            a.ntitle                           
                        });
+            int n = res.Count();
             return res.ToList();
         }
         [Authorize(Roles = "Administrator")]
@@ -334,7 +312,7 @@ namespace Webschool.Controllers
             var res = (from a in _nav.GetAll()
                        join b in _navrol.GetAll() on a.nid equals b.nid
                        join c in _context.Roles on b.RoleId equals c.Id
-                       // where c.Name.Contains(rol)
+                     //  where c.Name.Contains(rol)
                        select new
                        {
                            a.nid,
@@ -357,53 +335,29 @@ namespace Webschool.Controllers
             {
                 return BadRequest(ModelState);
             }
-            //if (nr.nid != "")
-            //{
-            //    var _nr = _navrol.GetAll().FirstOrDefault(x => x.nid == nr.nid && x.RoleId == nr.RoleId);
-            //    _nr.nid = nr.nid;
-            //    _nr.RoleId = nr.RoleId;
-            //    await _navrol.EditAsync(_nr);
-            //    return Ok();
-            //}
-            //else
-            //{
+
             if (nr.nid != "" && nr.RoleId != null)
             {
+                var xx = _navrol.GetAll().FirstOrDefault(p => p.nid == nr.nid && p.RoleId == nr.RoleId);
                 var _nr = new NavbarRole();
-                _nr.nrid = Guid.NewGuid().ToString();
-                _nr.nid = nr.nid;
-                _nr.RoleId = nr.RoleId;
-                await _navrol.InsertAsync(_nr);
+                if (xx ==null)
+                {
+                    _nr.nrid = Guid.NewGuid().ToString();
+                    _nr.nid = nr.nid;
+                    _nr.RoleId = nr.RoleId;
+                    await _navrol.InsertAsync(_nr);
+                }
             }
                
                 return Ok();
             //}
         }
-
+        
         // POST: api/Menu
         [Authorize(Roles = "Administrator")]
-        [HttpGet]
-        [Route("_delnrol")]
-        public async Task<IActionResult> _delnrol(string nr)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-            else
-            {
-                var _nr = _navrol.GetAll().Where(x => x.RoleId == nr).ToArray();
-                foreach(var f in _nr){
-                    await _navrol.DeleteAsync(f);
-                }                
-                return Ok();
-            }
-        }
-        // POST: api/Menu
-        [Authorize(Roles = "Administrator")]
-        [HttpGet]
+        [HttpPost]
         [Route("_delnavrol")]
-        public async Task<IActionResult> _delnavrol(string nr)
+        public async Task<IActionResult> _delnavrol([FromBody] NavbarRole nr)
         {
             if (!ModelState.IsValid)
             {
@@ -411,11 +365,10 @@ namespace Webschool.Controllers
             }
             else
             {
-                var _nr = _navrol.GetAll().Where(x => x.nid == nr).ToArray();
-                foreach (var f in _nr)
-                {
-                    await _navrol.DeleteAsync(f);
-                }
+                var _nr = _navrol.GetAll().FirstOrDefault(x => x.RoleId == nr.RoleId && x.nid == nr.nid);
+                //        //foreach(var f in _nr){
+                            await _navrol.DeleteAsync(_nr);
+                //        //}      
                 return Ok();
             }
         }

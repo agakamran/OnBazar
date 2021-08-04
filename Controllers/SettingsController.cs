@@ -45,7 +45,6 @@ namespace OnBazar.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IRepository<shipper> _ShippingDetail = null;        
         public SettingsController(IHostingEnvironment host, IRepository<store> firma, IRepository<beden> beden, IRepository<gender> gender, IRepository<categoriy> item_categ,
-
             IRepository<color> item_color, IRepository<desen> item_desen, IRepository<marka> item_marka, IRepository<material> item_materal,
             IRepository<stil> item_stil, IRepository<kullanimAlani> kullanimAlani, IRepository<kumashtipi> kumashtipi,
             IRepository<qelip> qelip, IRepository<qoltipi> qoltipi, IRepository<yaka> yaka, UserManager<ApplicationUser> userManager,
@@ -179,6 +178,7 @@ namespace OnBazar.Controllers
                            a.catId,
                            b.catname
                        });
+            int f = res.Count();
             return res.OrderBy(o => o.trEu).OrderBy(k => k.ayakUz).ToList();
             // return _beden.GetAll().OrderBy(o => o.bedenId);
         }
@@ -1113,11 +1113,12 @@ namespace OnBazar.Controllers
                            a.prodname,
                            a.barcode,
                            a.Discontinued,
-                           //a.price,
-                           //a.salesprice,
-                           //a.quantity,
-                           //a.discount,                           
-                           //a.delivery,
+                           a.buy_unitprice,
+                           a.boxquantity,
+                           a.sell_unitprice,
+                           a.unitsinstock,
+                           a.discount,                           
+                           a.delivery,
                            //a.qaimedate
                        });
 
@@ -1127,7 +1128,7 @@ namespace OnBazar.Controllers
         }
         [HttpPost]
         [Route("postitemdetail")]
-       // [Authorize]
+        // [Authorize]
         public async Task<IActionResult> postitemdetail([FromBody] product p)
         {
             if (!ModelState.IsValid) { return BadRequest(ModelState); }
@@ -1151,14 +1152,16 @@ namespace OnBazar.Controllers
                 _p.kumashId = p.kumashId;
                 _p.prodname = p.prodname;
                 _p.barcode = p.barcode;
-                //_p.price = p.price;
-                //_p.salesprice = p.salesprice;
-                //_p.quantity = p.quantity;
-                //_p.discount = p.discount;
-                //_p.hidden = p.hidden;
-                //_p.yakaId = p.yakaId;
-                //_p.qaimedate = p.qaimedate;
-                //_p.delivery = p.delivery;
+
+                _p.boxquantity = p.boxquantity;          //количество коробок 
+                _p.unitsinstock = p.unitsinstock;   //Единицы на складе     запасы       
+                _p.buy_unitprice = p.buy_unitprice;   //Цена за единицу      alish
+                _p.sell_unitprice = p.sell_unitprice;   //Цена за единицу      satish       
+                _p.discount = p.discount;//скидка                  
+                _p.ModifiedDate = DateTime.Now;
+                _p.Discontinued = p.Discontinued;       //Снято с производства       
+                _p.opr = p.opr;              //emeliyyat  
+               
                 await _itemdetail.EditAsync(_p);
                 return Ok(_p);
             }
@@ -1167,12 +1170,9 @@ namespace OnBazar.Controllers
                 // if (_itemdetail.GetAll().FirstOrDefault(f => f.item_name == p.item_name && f.firmaId == p.firmaId) == null)
                 // {
                 //var or = new orderdet();
-                
                 var pp = new product();
                 pp.proId = Guid.NewGuid().ToString();
                 // pp.qaime_Id = p.qaime_Id;
-                var ff = _firma.GetAll().FirstOrDefault(f => f.storemail == p.storId);
-                pp.storId = ff.storId;
                 pp.genId = p.genId;
                 pp.catId = p.catId;
                 pp.markaId = p.markaId;
@@ -1183,19 +1183,26 @@ namespace OnBazar.Controllers
                 pp.qolId = p.qolId;
                 pp.stilId = p.stilId;
                 pp.desId = p.desId;
+                pp.yakaId = p.yakaId;
                 pp.kulalanId = p.kulalanId;
                 pp.kumashId = p.kumashId;
                 pp.prodname = p.prodname;
                 pp.barcode = p.barcode;
-                //pp.price = p.price;
-                //pp.salesprice = p.salesprice;
-                //pp.quantity = p.quantity;
-                //pp.discount = p.discount;
-                //pp.hidden = p.hidden;
-                //pp.delivery = p.delivery;
+                var ff = _firma.GetAll().FirstOrDefault(f => f.storemail == p.storId);
+                pp.storId = ff.storId;
+                pp.boxquantity = p.boxquantity;          //количество коробок 
+                pp.unitsinstock = p.unitsinstock;   //Единицы на складе     запасы       
+                pp.buy_unitprice = p.buy_unitprice;   //Цена за единицу      alish
+                pp.sell_unitprice = p.sell_unitprice;   //Цена за единицу      satish       
+                pp.discount = p.discount;//скидка    
+                pp.ModifiedDate = DateTime.Now;
+                pp.Discontinued = p.Discontinued;       //Снято с производства       
+                pp.opr = p.opr;              //emeliyyat  
+                pp.delivery = p.delivery; //dastavka
+
                 //// string formattedIdentifier = p.qaime_date.ToString(System.Globalization.CultureInfo.InvariantCulture); // "02/10/2016 12:33:00"
                 //pp.qaimedate = p.qaimedate;
-                pp.yakaId = p.yakaId;
+
                 await _itemdetail.InsertAsync(pp);
                 // var c = pp.item_Id;
                 //  var ppp = _items_photo.GetAll().Where(k=>k.item_Id== "-111");
@@ -1207,6 +1214,7 @@ namespace OnBazar.Controllers
                 return Ok(pp);
                 //  }
                 //  else { return BadRequest(); }
+
             }
         }
 
