@@ -276,8 +276,8 @@ namespace OnBazar.Models
         public string colId { get; set; }
         [MaxLength(250)]
         public string prodname { get; set; }
-        [MaxLength(25)]
-        public string barcode { get; set; }
+       // [MaxLength(25)]
+        public decimal barcode { get; set; }
         [Required, MaxLength(36)]
         public string storId { get; set; }          //magaza
         public int boxquantity { get; set; }          //количество коробок 
